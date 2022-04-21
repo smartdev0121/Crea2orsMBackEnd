@@ -5,10 +5,10 @@ import { validator } from "../helpers/decorators";
 import User from "../models/User.model";
 import { sendCode, verifyCode } from "email-verification-code";
 import { send } from "process";
+import { sendMail } from "../services/sendgrid";
 import { sendMailGun } from "src/services/mailgun";
-const nodemailer = require("nodemailer");
 
-export default class AuthControlle {
+export default class AuthController {
   @validator([
     bodyCheck("email").exists().isEmail(),
     bodyCheck("password").exists(),
@@ -32,8 +32,32 @@ export default class AuthControlle {
 
   static async forgotPassword(req, res) {
     const { email } = req.body;
-    console.log(email);
-    sendMailGun(email, "Reset Password", "userRegisterSuccess");
+    console.log("1: ", email);
+    sendMailGun(email, "Reset Password", "userRegisterSuccess", {
+      name: req.user.nickName,
+    });
+    // await sendMail(email, "Reset Password", "userRegisterSuccess", {
+    //   name: "Charles",
+    // });
+    console.log("end");
     res.json("success");
+  }
+
+  static async resetPassword(req, res) {
+    const { password, email } = req.body;
+    const user = await User.findByEmail(email);
+    if (!user) {
+      res.status(422).send("email address is invalid");
+    }
+
+    user.password = password;
+    user.verified = true;
+    await user.save();
+
+    const token = jwt.sign(user.toJSON(), config.APP_SECRET, {
+      expiresIn: config.JWT_EXPIRE,
+    });
+
+    res.json({ token });
   }
 }

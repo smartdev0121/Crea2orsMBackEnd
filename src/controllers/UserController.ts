@@ -1,11 +1,12 @@
 import { Op } from "sequelize";
 import { body as bodyCheck } from "express-validator";
+import config from "../config";
 import randtoken from "rand-token";
-
 import { validator } from "../helpers/decorators";
 import User, { UserRoles } from "../models/User.model";
-import { sendMail } from "../services/sendgrid";
+import { sendMailGun } from "../services/mailgun";
 import { siteUrl } from "src/helpers";
+import jwt from "jsonwebtoken";
 
 export default class UserController {
   static async index(req, res) {
@@ -35,13 +36,13 @@ export default class UserController {
 
   @validator([
     bodyCheck("email").exists().isEmail(),
-    bodyCheck("firstName").exists(),
-    bodyCheck("lastName").exists(),
+    bodyCheck("nickName").exists(),
   ])
   static async create(req, res) {
     const { body } = req;
-    console.log("create==============");
-    const duplicates = await User.findByEmail(body.email);
+    const email = body.email;
+    console.log("create==============", body);
+    const duplicates = await User.findByEmail(email);
     if (duplicates) {
       res.status(422).json({ email: "dupllicates" });
       return;
@@ -50,17 +51,24 @@ export default class UserController {
     const user = await User.create({
       ...body,
     });
+    const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
+    const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
 
-    console.log(user.email);
-    // try {
-    //   await sendMail(user.email, "You are registered", "userRegisterSuccess", {
-    //     name: user.fullName,
-    //     loginUrl: siteUrl("/login"),
-    //   });
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    sendMailGun(email, "Confirm Email", "emailConfirm", {
+      name: body.nickName,
+      url: confirmUrl,
+    });
 
     res.json(user);
+  }
+
+  static async emailVerified(req, res) {
+    const { body } = req;
+    const email = body.email;
+    console.log("body:", email);
+    const user = await User.findByEmail(email);
+    user.verified = true;
+    await user.save();
+    res.json({ result: true });
   }
 }

@@ -38,15 +38,10 @@ class User extends Model<User> {
   @Column({
     allowNull: false,
   })
-  firstName: string;
-
-  @Column({
-    allowNull: false,
-  })
-  lastName: string;
+  nickName: string;
 
   get fullName() {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.nickName}`;
   }
 
   @Column({
@@ -68,8 +63,7 @@ class User extends Model<User> {
     return {
       id: this.id,
       email: this.email,
-      firstName: this.firstName,
-      lastName: this.lastName,
+      nickName: this.nickName,
       fullName: this.fullName,
       role: this.role,
     };

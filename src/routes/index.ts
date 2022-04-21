@@ -13,4 +13,7 @@ router.post("/auth/login", Controllers.Auth.login);
 router.get("/profile/info", Controllers.Profile.info);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 router.post("/auth/forgot_password", Controllers.Auth.forgotPassword);
+
+router.post("/auth/reset_password", Controllers.Auth.resetPassword);
+router.post("/email-verified", Controllers.User.emailVerified);
 export default router;
