@@ -41,7 +41,6 @@ export default class UserController {
   static async create(req, res) {
     const { body } = req;
     const email = body.email;
-    console.log("create==============", body);
     const duplicates = await User.findByEmail(email);
     if (duplicates) {
       res.status(422).json({ email: "dupllicates" });
