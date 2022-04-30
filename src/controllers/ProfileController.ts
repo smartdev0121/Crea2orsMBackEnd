@@ -4,7 +4,14 @@ import User, { UserRoles } from "../models/User.model";
 
 export default class ProfileController {
   static async info(req, res) {
-    const user = await User.findByPk(req.user.id);
+    let user = null;
+
+    try {
+      user = await User.findByPk(req.user.id);
+    } catch (err) {
+      console.log(err);
+      res.json({ result: false });
+    }
     res.json({
       ...user.toJSON(),
     });

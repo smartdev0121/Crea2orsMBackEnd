@@ -3,8 +3,13 @@ import cors from "cors";
 import compression from "compression";
 import morgan from "morgan";
 import bodyParser from "body-parser";
+import multer from "multer";
 import { errorHandler as queryErrorHandler } from "querymen";
 import { errorHandler as bodyErrorHandler } from "bodymen";
+
+console.log(bodyParser);
+
+var upload = multer();
 
 export default (routes) => {
   const app = express();
@@ -12,10 +17,14 @@ export default (routes) => {
   //if (process.env.NODE_ENV === "production") {
   app.use(cors());
   //}
-
   app.use(compression());
   app.use(morgan("dev"));
-  app.use(bodyParser.urlencoded({ extended: false }));
+
+  // console.log(__dirname);
+
+  // app.use(express.static(`${__dirname}\public`));
+  app.use(express.static("public"));
+
   app.use(bodyParser.json());
   app.use(routes);
   app.use(queryErrorHandler());

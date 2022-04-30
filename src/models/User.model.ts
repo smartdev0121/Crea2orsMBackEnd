@@ -25,9 +25,29 @@ class User extends Model<User> {
   email: string;
 
   @Column({
+    allowNull: true,
+  })
+  bio: string;
+
+  @Column({
+    allowNull: true,
+  })
+  customUrl: string;
+
+  @Column({
+    allowNull: true,
+  })
+  personalSite: string;
+
+  @Column({
     allowNull: false,
   })
   password: string;
+
+  @Column({
+    allowNull: true,
+  })
+  avatar_url: string;
 
   @Column({
     type: DataType.ENUM("admin", "agent"),
@@ -66,6 +86,10 @@ class User extends Model<User> {
       nickName: this.nickName,
       fullName: this.fullName,
       role: this.role,
+      bio: this.bio,
+      customUrl: this.customUrl,
+      personalSite: this.personalSite,
+      avatar_url: this.avatar_url,
     };
   }
 

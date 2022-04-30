@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { json, Op } from "sequelize";
 import { body as bodyCheck } from "express-validator";
 import config from "../config";
 import randtoken from "rand-token";
@@ -64,10 +64,49 @@ export default class UserController {
   static async emailVerified(req, res) {
     const { body } = req;
     const email = body.email;
-    console.log("body:", email);
     const user = await User.findByEmail(email);
     user.verified = true;
     await user.save();
     res.json({ result: true });
   }
+
+  static async getUserInfo(req, res) {
+    let user = null;
+
+    try {
+      user = await User.findByPk(req.user.id);
+    } catch (err) {
+      console.log(err);
+      res.json({ result: false });
+    }
+    res.json({ ...user.toJSON() });
+  }
+
+  // @validator([bodyCheck("email").exists().isEmail()])
+  static async setUserInfo(req, res) {
+    const { body, file } = req;
+    console.log(req.file.filename);
+    console.log(req.body);
+
+    const user = await User.findByEmail(body.email);
+
+    if (user && body.email !== req.user.email) {
+      res.status(422).json({ email: "duplicates" });
+      return;
+    }
+
+    user.customUrl = body.customUrl;
+    user.bio = body.bio;
+    user.personalSite = body.personalSite;
+    user.avatar_url = req.file.filename;
+    await user.save();
+    res.json(user);
+  }
+
+  static async getAvatarUrl(req, res) {
+    const user = await User.findByPk(req.user.id);
+    res.json({ avatar_url: user.avatar_url });
+  }
+
+  static async goProfilePage(req, res) {}
 }
