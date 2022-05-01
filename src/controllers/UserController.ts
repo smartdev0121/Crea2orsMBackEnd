@@ -72,7 +72,7 @@ export default class UserController {
 
   static async getUserInfo(req, res) {
     let user = null;
-
+    console.log("getUSERINFO", req.user.id);
     try {
       user = await User.findByPk(req.user.id);
     } catch (err) {
@@ -85,7 +85,6 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req, res) {
     const { body, file } = req;
-    console.log(req.file.filename);
     console.log(req.body);
 
     const user = await User.findByEmail(body.email);
@@ -98,8 +97,13 @@ export default class UserController {
     user.customUrl = body.customUrl;
     user.bio = body.bio;
     user.personalSite = body.personalSite;
-    user.avatar_url = req.file.filename;
-    await user.save();
+
+    if (JSON.parse(body.handled)) user.avatar_url = file.filename;
+    try {
+      await user.save();
+    } catch (err) {
+      console.log(err);
+    }
     res.json(user);
   }
 
@@ -108,5 +112,16 @@ export default class UserController {
     res.json({ avatar_url: user.avatar_url });
   }
 
-  static async goProfilePage(req, res) {}
+  static async goProfilePage(req, res) {
+    // console.log(req.param);
+    console.log(req.params.custom_url);
+    // console.log(req.query);
+    const user = await User.findByCustomUrl(req.params.custom_url);
+    if (user) {
+      res.json({ ...user.toJSON() });
+      return;
+    } else {
+      res.status(422).json({ result: false });
+    }
+  }
 }

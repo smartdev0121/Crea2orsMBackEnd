@@ -31,6 +31,9 @@ const upload = multer({
 const router = Router();
 router.use(jwt);
 console.log("post request");
+//===================== users profile pages ====================//
+router.get("/custom/:custom_url", Controllers.User.goProfilePage);
+
 router.post("/users", Controllers.User.create);
 router.post("/auth/login", Controllers.Auth.login);
 router.get("/profile/info", Controllers.Profile.info);

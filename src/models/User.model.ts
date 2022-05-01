@@ -90,12 +90,19 @@ class User extends Model<User> {
       customUrl: this.customUrl,
       personalSite: this.personalSite,
       avatar_url: this.avatar_url,
+      verified: this.verified,
     };
   }
 
   static findByEmail(email) {
     return User.findOne({
       where: { email },
+    });
+  }
+
+  static findByCustomUrl(url) {
+    return User.findOne({
+      where: { customUrl: url },
     });
   }
 
