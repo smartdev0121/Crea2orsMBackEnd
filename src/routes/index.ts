@@ -50,5 +50,11 @@ router.post(
   Controllers.User.setUserInfo
 );
 
+router.post(
+  "/background-update",
+  upload.single("file_back"),
+  Controllers.User.updateProfileBackground
+);
+
 router.get("/get-avatar-url", Controllers.User.getAvatarUrl);
 export default router;

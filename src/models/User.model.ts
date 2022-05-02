@@ -100,6 +100,8 @@ class User extends Model<User> {
     });
   }
 
+  static updateProfileBackground(req, res) {}
+
   static findByCustomUrl(url) {
     return User.findOne({
       where: { customUrl: url },

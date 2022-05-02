@@ -82,6 +82,11 @@ export default class UserController {
     res.json({ ...user.toJSON() });
   }
 
+  static updateProfileBackground(req, res) {
+    const { file } = req;
+    console.log(file.filename);
+  }
+
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req, res) {
     const { body, file } = req;
