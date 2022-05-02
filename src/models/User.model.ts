@@ -72,6 +72,11 @@ class User extends Model<User> {
   @Column
   reset_token: string;
 
+  @Column({
+    allowNull: true,
+  })
+  background_image_url: string;
+
   @Column
   verification_token: string;
 
@@ -91,6 +96,7 @@ class User extends Model<User> {
       personalSite: this.personalSite,
       avatar_url: this.avatar_url,
       verified: this.verified,
+      backgroundImageUrl: this.background_image_url,
     };
   }
 
@@ -99,8 +105,6 @@ class User extends Model<User> {
       where: { email },
     });
   }
-
-  static updateProfileBackground(req, res) {}
 
   static findByCustomUrl(url) {
     return User.findOne({

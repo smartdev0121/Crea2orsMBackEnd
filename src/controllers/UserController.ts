@@ -82,10 +82,14 @@ export default class UserController {
     res.json({ ...user.toJSON() });
   }
 
-  static updateProfileBackground(req, res) {
+  static updateProfileBackground = async (req, res) => {
     const { file } = req;
     console.log(file.filename);
-  }
+    const user = await User.findByPk(req.user.id);
+    user.background_image_url = file.filename;
+    await user.save();
+    res.json({ ...user.toJSON() });
+  };
 
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req, res) {
