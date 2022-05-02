@@ -91,6 +91,18 @@ export default class UserController {
     res.json({ ...user.toJSON() });
   };
 
+  static addFollow = async (req, res) => {
+    const otherUser = await User.findByEmail(req.body.email);
+    console.log(req.user);
+    const curUser = await User.findByPk(req.user.id);
+    otherUser.followers_num = otherUser.followers_num + 1;
+    curUser.followings_num = curUser.followings_num + 1;
+
+    await otherUser.save();
+    await curUser.save();
+    res.json({ ...otherUser.toJSON() });
+  };
+
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req, res) {
     const { body, file } = req;

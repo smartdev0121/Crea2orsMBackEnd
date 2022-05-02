@@ -77,6 +77,16 @@ class User extends Model<User> {
   })
   background_image_url: string;
 
+  @Column({
+    allowNull: true,
+  })
+  followers_num: number;
+
+  @Column({
+    allowNull: true,
+  })
+  followings_num: number;
+
   @Column
   verification_token: string;
 
@@ -97,6 +107,8 @@ class User extends Model<User> {
       avatar_url: this.avatar_url,
       verified: this.verified,
       backgroundImageUrl: this.background_image_url,
+      followers_num: this.followers_num,
+      followings_num: this.followings_num,
     };
   }
 
