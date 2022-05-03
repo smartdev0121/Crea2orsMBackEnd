@@ -4,6 +4,8 @@ import config from "../config";
 import randtoken from "rand-token";
 import { validator } from "../helpers/decorators";
 import User, { UserRoles } from "../models/User.model";
+import Followers from "../models/Followers.model";
+import Followings from "../models/Followings.model";
 import { sendMailGun } from "../services/mailgun";
 import { siteUrl } from "src/helpers";
 import jwt from "jsonwebtoken";
@@ -72,14 +74,19 @@ export default class UserController {
 
   static async getUserInfo(req, res) {
     let user = null;
-    console.log("getUSERINFO", req.user.id);
+    const followers = await Followers.findFollowersById(req.user.id);
+    const followings = await Followings.findFollowingsById(req.user.id);
     try {
       user = await User.findByPk(req.user.id);
     } catch (err) {
       console.log(err);
       res.json({ result: false });
     }
-    res.json({ ...user.toJSON() });
+    res.json({
+      ...user.toJSON(),
+      followers: followers,
+      followings: followings,
+    });
   }
 
   static updateProfileBackground = async (req, res) => {
@@ -134,12 +141,17 @@ export default class UserController {
   }
 
   static async goProfilePage(req, res) {
-    // console.log(req.param);
     console.log(req.params.custom_url);
-    // console.log(req.query);
     const user = await User.findByCustomUrl(req.params.custom_url);
+
+    const followers = await Followers.findFollowersById(user.id);
+    const followings = await Followings.findFollowingsById(user.id);
     if (user) {
-      res.json({ ...user.toJSON() });
+      res.json({
+        ...user.toJSON(),
+        followers: followers,
+        followings: followings,
+      });
       return;
     } else {
       res.status(422).json({ result: false });
