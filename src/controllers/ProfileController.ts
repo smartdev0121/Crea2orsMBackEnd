@@ -9,7 +9,6 @@ export default class ProfileController {
     try {
       user = await User.findByPk(req.user.id);
     } catch (err) {
-      console.log(err);
       res.json({ result: false });
     }
     res.json({

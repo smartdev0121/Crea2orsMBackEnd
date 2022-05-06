@@ -6,12 +6,10 @@ import config from "../config";
 sgMail.setApiKey(config.SENDGRID_API_KEY);
 
 export const sendMail = async (to, subject, template, data) => {
-  console.log("start");
   const html = await ejs.renderFile(
     path.resolve(__dirname, `../../templates/${template}.ejs`),
     data
   );
-  console.log("html rendered");
 
   return sgMail.send({
     from: {

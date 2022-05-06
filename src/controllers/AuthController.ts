@@ -20,7 +20,7 @@ export default class AuthController {
     });
 
     if (!user || !user.validPassword(password)) {
-      return res.status(401).json({ token: null });
+      return res.status(401).json({ token: "noToken" });
     }
 
     const token = jwt.sign(user.toJSON(), config.APP_SECRET, {
@@ -32,14 +32,12 @@ export default class AuthController {
 
   static async forgotPassword(req, res) {
     const { email } = req.body;
-    console.log("1: ", email);
     sendMailGun(email, "Reset Password", "userRegisterSuccess", {
       name: req.user.nickName,
     });
     // await sendMail(email, "Reset Password", "userRegisterSuccess", {
     //   name: "Charles",
     // });
-    console.log("end");
     res.json("success");
   }
 

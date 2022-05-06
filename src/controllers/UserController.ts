@@ -79,7 +79,6 @@ export default class UserController {
     try {
       user = await User.findByPk(req.user.id);
     } catch (err) {
-      console.log(err);
       res.json({ result: false });
     }
     res.json({
@@ -91,7 +90,6 @@ export default class UserController {
 
   static updateProfileBackground = async (req, res) => {
     const { file } = req;
-    console.log(file.filename);
     const user = await User.findByPk(req.user.id);
     user.background_image_url = file.filename;
     await user.save();
@@ -100,7 +98,6 @@ export default class UserController {
 
   static addFollow = async (req, res) => {
     const otherUser = await User.findByEmail(req.body.email);
-    console.log(req.user);
     const curUser = await User.findByPk(req.user.id);
     otherUser.followers_num = otherUser.followers_num + 1;
     curUser.followings_num = curUser.followings_num + 1;
@@ -113,7 +110,6 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req, res) {
     const { body, file } = req;
-    console.log(req.body);
 
     const user = await User.findByEmail(body.email);
 
@@ -129,9 +125,7 @@ export default class UserController {
     if (JSON.parse(body.handled)) user.avatar_url = file.filename;
     try {
       await user.save();
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
     res.json(user);
   }
 
@@ -141,7 +135,6 @@ export default class UserController {
   }
 
   static async goProfilePage(req, res) {
-    console.log(req.params.custom_url);
     const user = await User.findByCustomUrl(req.params.custom_url);
 
     const followers = await Followers.findFollowersById(user.id);

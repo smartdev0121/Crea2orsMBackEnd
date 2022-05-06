@@ -7,8 +7,6 @@ import multer from "multer";
 import { errorHandler as queryErrorHandler } from "querymen";
 import { errorHandler as bodyErrorHandler } from "bodymen";
 
-console.log(bodyParser);
-
 var upload = multer();
 
 export default (routes) => {
@@ -19,8 +17,6 @@ export default (routes) => {
   //}
   app.use(compression());
   app.use(morgan("dev"));
-
-  // console.log(__dirname);
 
   // app.use(express.static(`${__dirname}\public`));
   app.use(express.static("public"));

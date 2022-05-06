@@ -58,7 +58,6 @@ export default class FollowController {
 
     const followers = await Followers.findFollowersById(id);
     const followings = await Followings.findFollowingsById(id);
-    console.log(followers);
 
     res.json({ followers: followers, followings: followings });
   }

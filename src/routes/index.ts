@@ -30,7 +30,6 @@ const upload = multer({
 // 2
 const router = Router();
 router.use(jwt);
-console.log("post request");
 //===================== users profile pages ====================//
 router.get("/custom/:custom_url", Controllers.User.goProfilePage);
 
@@ -59,4 +58,5 @@ router.post(
 );
 
 router.get("/get-avatar-url", Controllers.User.getAvatarUrl);
+router.post("/contract-deployed", Controllers.Contract.saveContractInformation);
 export default router;
