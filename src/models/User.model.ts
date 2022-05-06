@@ -99,7 +99,6 @@ class User extends Model<User> {
       id: this.id,
       email: this.email,
       nickName: this.nickName,
-      fullName: this.fullName,
       role: this.role,
       bio: this.bio,
       customUrl: this.customUrl,

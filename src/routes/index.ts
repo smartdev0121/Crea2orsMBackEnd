@@ -29,12 +29,15 @@ const upload = multer({
 });
 // 2
 const router = Router();
-router.use(jwt);
-//===================== users profile pages ====================//
-router.get("/custom/:custom_url", Controllers.User.goProfilePage);
 
 router.post("/users", Controllers.User.create);
 router.post("/auth/login", Controllers.Auth.login);
+
+router.use(jwt);
+//===================== users profile pages ====================//
+router.get("/custom/:custom_url", Controllers.User.goProfilePage);
+router.get("/contract/:contractAddress", Controllers.Contract.getContractUri);
+
 router.get("/profile/info", Controllers.Profile.info);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 router.post("/auth/forgot_password", Controllers.Auth.forgotPassword);
