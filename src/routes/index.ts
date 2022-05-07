@@ -32,22 +32,22 @@ const router = Router();
 
 router.post("/users", Controllers.User.create);
 router.post("/auth/login", Controllers.Auth.login);
+router.post("/auth/forgot_password", Controllers.Auth.forgotPassword);
+router.post("/follow", Controllers.Follow.insert);
+router.post("/unfollow", Controllers.Follow.delete);
 
 router.use(jwt);
 //===================== users profile pages ====================//
 router.get("/custom/:custom_url", Controllers.User.goProfilePage);
 router.get("/contract/:contractAddress", Controllers.Contract.getContractUri);
-
+router.post("/create-nft", Controllers.Contract.createNFT);
 router.get("/profile/info", Controllers.Profile.info);
 router.use("/pusher/auth", Controllers.Pusher.auth);
-router.post("/auth/forgot_password", Controllers.Auth.forgotPassword);
 
 router.post("/auth/reset_password", Controllers.Auth.resetPassword);
 router.post("/email-verified", Controllers.User.emailVerified);
 router.get("/get-user-info", Controllers.User.getUserInfo);
 
-router.post("/follow", Controllers.Follow.insert);
-router.post("/unfollow", Controllers.Follow.delete);
 router.post(
   "/set-user-info",
   upload.single("file_attachment"),
