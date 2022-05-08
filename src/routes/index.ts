@@ -41,7 +41,9 @@ router.use(jwt);
 router.get("/custom/:custom_url", Controllers.User.goProfilePage);
 router.get("/contract/:contractAddress", Controllers.Contract.getContractUri);
 router.post("/create-nft", Controllers.Contract.createNFT);
+router.get("/get-nft/:nftId", Controllers.Contract.getNFT);
 router.get("/profile/info", Controllers.Profile.info);
+router.get("/get-user-collections", Controllers.Contract.getUserCollections);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 
 router.post("/auth/reset_password", Controllers.Auth.resetPassword);

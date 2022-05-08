@@ -1,9 +1,8 @@
-import {Table, Column, DataType, Model} from "sequelize-typescript"
+import { Table, Column, DataType, Model } from "sequelize-typescript";
 
 @Table({
   updatedAt: false,
 })
-
 class NFTs extends Model<NFTs> {
   @Column({
     allowNull: false,
@@ -25,10 +24,10 @@ class NFTs extends Model<NFTs> {
     allowNull: false,
   })
   description: string;
-  
+
   @Column({
     allowNull: false,
-    type: DataType.INTEGER
+    type: DataType.INTEGER,
   })
   batch_size: number;
 
@@ -45,7 +44,7 @@ class NFTs extends Model<NFTs> {
 
   @Column({
     allowNull: false,
-    type: DataType.INTEGER
+    type: DataType.INTEGER,
   })
   royalty_fee: number;
 
@@ -59,6 +58,21 @@ class NFTs extends Model<NFTs> {
   })
   traits: string;
 
+  toJSON() {
+    return {
+      id: this.id,
+      contractId: this.contract_id,
+      metaDataUrl: this.metadata_url,
+      name: this.name,
+      description: this.description,
+      batchSize: this.batch_size,
+      price: this.price,
+      alterText: this.alter_text,
+      royaltyFee: this.royalty_fee,
+      fileUrl: this.file_url,
+      traits: this.traits,
+    };
+  }
 }
 
 export default NFTs;
