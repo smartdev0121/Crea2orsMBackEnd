@@ -44,6 +44,8 @@ router.post("/create-nft", Controllers.Contract.createNFT);
 router.get("/get-nft/:nftId", Controllers.Contract.getNFT);
 router.get("/profile/info", Controllers.Profile.info);
 router.get("/get-user-collections", Controllers.Contract.getUserCollections);
+router.post("/order-created", Controllers.Contract.orderCreated);
+router.get("/get-orders", Controllers.Contract.getOrders);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 
 router.post("/auth/reset_password", Controllers.Auth.resetPassword);

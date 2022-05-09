@@ -1,5 +1,8 @@
 import Contracts from "../models/Contracts.model";
 import NFTs from "../models/NFTs.model";
+import Owners from "../models/Owners.model";
+import User from "../models/User.model";
+import Orders from "../models/Orders.model";
 
 export default class ContractController {
   static async saveContractInformation(req, res) {
@@ -17,6 +20,7 @@ export default class ContractController {
         token_limit: metaData.tokenLimit,
         image_url: imageUri,
       });
+
       res.json({ result: true });
     } catch (err) {
       console.log(err);
@@ -44,8 +48,8 @@ export default class ContractController {
   }
 
   static async createNFT(req, res) {
-    const { contractId, metaData, metaDataUri, fileUri } = req.body;
-
+    const { contractId, metaData, metaDataUri, fileUri, nftId } = req.body;
+    console.log(nftId);
     try {
       const NFT = await NFTs.create({
         contract_id: contractId,
@@ -53,11 +57,17 @@ export default class ContractController {
         name: metaData.name,
         description: metaData.description,
         batch_size: metaData.batchSize,
-        price: metaData.price,
         alter_text: metaData.alterText,
         royalty_fee: metaData.royaltyFee,
+        nft_id: nftId,
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
+      });
+
+      await Owners.create({
+        nft_id: nftId,
+        user_id: req.user.id,
+        amount: metaData.batchSize,
       });
 
       res.json({ nftId: NFT.id, name: NFT.name });
@@ -72,13 +82,20 @@ export default class ContractController {
     try {
       const NFT = await NFTs.findOne({
         where: { id: nftId },
+        include: [Contracts],
       });
+
+      const owners = await Owners.findAll({
+        where: { nft_id: NFT.nft_id },
+        include: [User],
+      });
+      console.log(owners);
 
       if (!NFT) {
         res.status(422).json({ result: false });
         return;
       }
-      res.json({ ...NFT.toJSON() });
+      res.json({ ...NFT.toJSON(), owners });
     } catch (err) {
       console.log(err);
       res.status(422).json({ result: false });
@@ -98,5 +115,45 @@ export default class ContractController {
       console.log(err);
       res.status(422).json({ result: false });
     }
+  }
+
+  static async orderCreated(req, res) {
+    const { orderData } = req.body;
+    try {
+      const order = await Orders.create({
+        nft_id: orderData._tokenId,
+        creator_id: req.user.id,
+        creator_address: orderData._creator,
+        amount: orderData._amount,
+        price: orderData._price,
+        start_time: orderData._startTime,
+        end_time: orderData._endTime,
+        order_type: orderData._orderType,
+        max_bid_price: -1
+      });
+
+      if (!order) {
+        res.status(422).json({ result: false });
+      }
+
+      res.json({ newOrder: order });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
+  static async getOrders(req, res) {
+    try {
+      const ordersData = await Orders.findAll(
+        {include: [User]}
+      );
+      console.log(ordersData);
+      res.json({ordersData: ordersData});
+    } catch(err) {
+      res.status(422).json({result: false});
+      console.log(err)
+    }
+
   }
 }

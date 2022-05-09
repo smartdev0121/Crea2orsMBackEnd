@@ -1,9 +1,18 @@
-import { Table, Column, DataType, Model } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  BelongsTo,
+  ForeignKey,
+} from "sequelize-typescript";
+import Contracts from "./Contracts.model";
 
 @Table({
   updatedAt: false,
 })
 class NFTs extends Model<NFTs> {
+  @ForeignKey(() => Contracts)
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
@@ -35,7 +44,7 @@ class NFTs extends Model<NFTs> {
     allowNull: false,
     type: DataType.INTEGER,
   })
-  price: number;
+  nft_id: number;
 
   @Column({
     allowNull: true,
@@ -58,6 +67,9 @@ class NFTs extends Model<NFTs> {
   })
   traits: string;
 
+  @BelongsTo(() => Contracts, { onDelete: "CASCADE" })
+  Contracts: Contracts;
+
   toJSON() {
     return {
       id: this.id,
@@ -66,11 +78,12 @@ class NFTs extends Model<NFTs> {
       name: this.name,
       description: this.description,
       batchSize: this.batch_size,
-      price: this.price,
       alterText: this.alter_text,
       royaltyFee: this.royalty_fee,
       fileUrl: this.file_url,
       traits: this.traits,
+      nftId: this.nft_id,
+      Contract: this.Contracts,
     };
   }
 }
