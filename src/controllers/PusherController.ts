@@ -1,7 +1,7 @@
 import pusher from "../services/pusher";
 
 export default class PusherController {
-  static async auth(req, res) {
+  static async auth(req: any, res: any) {
     const { user, body } = req;
     const socketId = body.socket_id;
     const channel = body.channel_name;

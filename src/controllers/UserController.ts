@@ -1,9 +1,8 @@
 import { json, Op } from "sequelize";
 import { body as bodyCheck } from "express-validator";
 import config from "../config";
-import randtoken from "rand-token";
 import { validator } from "../helpers/decorators";
-import User, { UserRoles } from "../models/User.model";
+import User from "../models/User.model";
 import Followers from "../models/Followers.model";
 import Followings from "../models/Followings.model";
 import { sendMailGun } from "../services/mailgun";
@@ -11,7 +10,7 @@ import { siteUrl } from "src/helpers";
 import jwt from "jsonwebtoken";
 
 export default class UserController {
-  static async index(req, res) {
+  static async index(req: any, res: any) {
     const users = await User.findAll({
       where: {
         id: { [Op.gt]: 1 },
@@ -25,7 +24,7 @@ export default class UserController {
     bodyCheck("email").exists().isEmail(),
     bodyCheck("id").optional().isInt(),
   ])
-  static async emailExists(req, res) {
+  static async emailExists(req: any, res: any) {
     const { body } = req;
     const id = body.id || req.user.id;
     const user = await User.findByEmail(body.email);
@@ -36,13 +35,28 @@ export default class UserController {
     }
   }
 
+  static async setWalletAddress(req, res) {
+    const { walletAddress } = req.body;
+    console.log("==============", req.body);
+    try {
+      const user = await User.findByPk(req.user.id);
+      user.wallet_address = walletAddress;
+      await user.save();
+      res.json({ ...user });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
   @validator([
     bodyCheck("email").exists().isEmail(),
-    bodyCheck("nickName").exists(),
+    bodyCheck("nick_name").exists(),
   ])
-  static async create(req, res) {
+  static async create(req: any, res: any) {
     const { body } = req;
     const email = body.email;
+    console.log("=================", body);
     const duplicates = await User.findByEmail(email);
     if (duplicates) {
       res.status(422).json({ email: "dupllicates" });
@@ -63,7 +77,7 @@ export default class UserController {
     res.json(user);
   }
 
-  static async emailVerified(req, res) {
+  static async emailVerified(req: any, res: any) {
     const { body } = req;
     const email = body.email;
     const user = await User.findByEmail(email);
@@ -72,7 +86,7 @@ export default class UserController {
     res.json({ result: true });
   }
 
-  static async getUserInfo(req, res) {
+  static async getUserInfo(req: any, res: any) {
     let user = null;
     const followers = await Followers.findFollowersById(req.user.id);
     const followings = await Followings.findFollowingsById(req.user.id);
@@ -88,7 +102,7 @@ export default class UserController {
     });
   }
 
-  static updateProfileBackground = async (req, res) => {
+  static updateProfileBackground = async (req: any, res: any) => {
     const { file } = req;
     const user = await User.findByPk(req.user.id);
     user.background_image_url = file.filename;
@@ -96,7 +110,7 @@ export default class UserController {
     res.json({ ...user.toJSON() });
   };
 
-  static addFollow = async (req, res) => {
+  static addFollow = async (req: any, res: any) => {
     const otherUser = await User.findByEmail(req.body.email);
     const curUser = await User.findByPk(req.user.id);
     otherUser.followers_num = otherUser.followers_num + 1;
@@ -108,7 +122,7 @@ export default class UserController {
   };
 
   // @validator([bodyCheck("email").exists().isEmail()])
-  static async setUserInfo(req, res) {
+  static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
 
     const user = await User.findByEmail(body.email);
@@ -118,9 +132,9 @@ export default class UserController {
       return;
     }
 
-    user.customUrl = body.customUrl;
+    user.custom_url = body.customUrl;
     user.bio = body.bio;
-    user.personalSite = body.personalSite;
+    user.personal_site = body.personalSite;
 
     if (JSON.parse(body.handled)) user.avatar_url = file.filename;
     try {
@@ -129,12 +143,12 @@ export default class UserController {
     res.json(user);
   }
 
-  static async getAvatarUrl(req, res) {
+  static async getAvatarUrl(req: any, res: any) {
     const user = await User.findByPk(req.user.id);
     res.json({ avatar_url: user.avatar_url });
   }
 
-  static async goProfilePage(req, res) {
+  static async goProfilePage(req: any, res: any) {
     const user = await User.findByCustomUrl(req.params.custom_url);
 
     const followers = await Followers.findFollowersById(user.id);

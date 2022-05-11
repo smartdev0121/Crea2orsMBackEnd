@@ -27,6 +27,12 @@ class Owners extends Model<Owners> {
 
   @Column({
     allowNull: false,
+    type: DataType.STRING,
+  })
+  user_wallet_address: string;
+
+  @Column({
+    allowNull: false,
     type: DataType.INTEGER,
   })
   amount: number;

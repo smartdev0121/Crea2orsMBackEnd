@@ -6,7 +6,7 @@ import {
   BelongsTo,
   ForeignKey,
 } from "sequelize-typescript";
-import Contracts from "./Contracts.model";
+import Contracts from "./Collections.model";
 
 @Table({
   updatedAt: false,

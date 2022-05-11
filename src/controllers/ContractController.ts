@@ -1,15 +1,14 @@
-import Contracts from "../models/Contracts.model";
+import Collections from "../models/Collections.model";
 import NFTs from "../models/NFTs.model";
 import Owners from "../models/Owners.model";
 import User from "../models/User.model";
 import Orders from "../models/Orders.model";
 
 export default class ContractController {
-  static async saveContractInformation(req, res) {
+  static async saveContractInformation(req: any, res: any) {
     const { contractUri, contractAddress, metaData, imageUri } = req.body;
-    console.log(contractUri, contractAddress);
     try {
-      const contract = await Contracts.create({
+      const contract = await Collections.create({
         user_id: req.user.id,
         contract_address: contractAddress,
         contract_uri: contractUri,
@@ -28,11 +27,10 @@ export default class ContractController {
     }
   }
 
-  static async getContractUri(req, res) {
+  static async getContractUri(req: any, res: any) {
     const contractAddress = req.params.contractAddress;
-    console.log("contractAddress", contractAddress);
 
-    const contract = await Contracts.findOne({
+    const contract = await Collections.findOne({
       where: { contract_address: contractAddress },
     });
 
@@ -47,9 +45,16 @@ export default class ContractController {
     }
   }
 
-  static async createNFT(req, res) {
-    const { contractId, metaData, metaDataUri, fileUri, nftId } = req.body;
-    console.log(nftId);
+  static async createNFT(req: any, res: any) {
+    const {
+      contractId,
+      metaData,
+      metaDataUri,
+      fileUri,
+      nftId,
+      curWalletAddress,
+    } = req.body;
+    console.log("curWall", curWalletAddress);
     try {
       const NFT = await NFTs.create({
         contract_id: contractId,
@@ -67,6 +72,7 @@ export default class ContractController {
       await Owners.create({
         nft_id: nftId,
         user_id: req.user.id,
+        user_wallet_address: curWalletAddress,
         amount: metaData.batchSize,
       });
 
@@ -77,19 +83,18 @@ export default class ContractController {
     }
   }
 
-  static async getNFT(req, res) {
+  static async getNFT(req: any, res: any) {
     const nftId = req.params.nftId;
     try {
       const NFT = await NFTs.findOne({
         where: { id: nftId },
-        include: [Contracts],
+        include: [Collections],
       });
 
       const owners = await Owners.findAll({
         where: { nft_id: NFT.nft_id },
         include: [User],
       });
-      console.log(owners);
 
       if (!NFT) {
         res.status(422).json({ result: false });
@@ -102,14 +107,13 @@ export default class ContractController {
     }
   }
 
-  static async getUserCollections(req, res) {
+  static async getUserCollections(req: any, res: any) {
     const userId = req.user.id;
 
     try {
-      const collections = await Contracts.findAll({
+      const collections = await Collections.findAll({
         where: { user_id: userId },
       });
-      console.log(collections);
       res.json({ collections });
     } catch (err) {
       console.log(err);
@@ -117,19 +121,32 @@ export default class ContractController {
     }
   }
 
-  static async orderCreated(req, res) {
-    const { orderData } = req.body;
+  static async getAllCollections(req: any, res: any) {
+    const userId = req.user.id;
+
+    try {
+      const collections = await Collections.findAll();
+      res.json({ collections });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
+  static async orderCreated(req: any, res: any) {
+    const { orderData, nftId } = req.body;
     try {
       const order = await Orders.create({
-        nft_id: orderData._tokenId,
+        nft_id: nftId,
         creator_id: req.user.id,
         creator_address: orderData._creator,
         amount: orderData._amount,
-        price: orderData._price,
+        price: orderData._price / Math.pow(10, 9),
         start_time: orderData._startTime,
         end_time: orderData._endTime,
         order_type: orderData._orderType,
-        max_bid_price: -1
+        buyer_price: orderData._price / Math.pow(10, 9),
+        buyer_address: orderData._buyer,
       });
 
       if (!order) {
@@ -143,17 +160,100 @@ export default class ContractController {
     }
   }
 
-  static async getOrders(req, res) {
+  static async getOrders(req: any, res: any) {
+    const nftId = req.params.nftId;
+    console.log(nftId);
     try {
-      const ordersData = await Orders.findAll(
-        {include: [User]}
-      );
+      const ordersData = await Orders.findAll({
+        where: { status: 1, nft_id: nftId },
+        include: [User],
+      });
       console.log(ordersData);
-      res.json({ordersData: ordersData});
-    } catch(err) {
-      res.status(422).json({result: false});
-      console.log(err)
+      res.json({ ordersData: ordersData });
+    } catch (err) {
+      res.status(422).json({ result: false });
+      console.log(err);
     }
+  }
 
+  static async cancelOrder(req: any, res: any) {
+    const { id } = req.body;
+    try {
+      const order = await Orders.update({ status: 0 }, { where: { id: id } });
+      if (order) {
+        res.json({ result: true });
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
+  static async orderFinalized(req: any, res: any) {
+    const { orderData, orderId, nftId } = req.body;
+
+    try {
+      const order = await Orders.findOne({
+        where: { id: orderId },
+      });
+
+      order.status = 0;
+      await order.save();
+
+      const previousOwner = await Owners.findOne({
+        where: { nft_id: nftId, user_wallet_address: orderData[0] },
+      });
+      previousOwner.amount == orderData[3]
+        ? await previousOwner.destroy()
+        : (previousOwner.amount -= orderData[3]);
+
+      const user = await User.findOne({
+        where: { wallet_address: orderData[8] },
+      });
+      const userId = user.id;
+
+      const newOwner = await Owners.findOne({
+        where: { user_wallet_address: orderData[8] },
+      });
+
+      if (newOwner) {
+        newOwner.amount += orderData[3];
+      } else {
+        await Owners.create({
+          nft_id: nftId,
+          user_id: userId,
+          user_wallet_address: orderData[8],
+          amount: orderData[3],
+        });
+      }
+
+      const ordersData = await Orders.findAll({
+        where: { nft_id: nftId, status: 1 },
+      });
+      res.json({ ordersData });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
+  static async newBidPlaced(req, res) {
+    const { orderData, orderId, nftId } = req.body;
+    console.log("HJJJJJJJJJJJ", orderData, orderId, nftId);
+    try {
+      const order = await Orders.findOne({ where: { id: orderId } });
+      order.buyer_address = orderData[8];
+      order.buyer_price = orderData[9] / Math.pow(10, 9);
+      await order.save();
+
+      const ordersData = await Orders.findAll({
+        where: { nft_id: nftId, status: 1 },
+        include: [User],
+      });
+      res.json({ ordersData });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
   }
 }

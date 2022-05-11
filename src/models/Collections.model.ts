@@ -1,16 +1,9 @@
-import {
-  Table,
-  Column,
-  DataType,
-  Model,
-  BeforeCreate,
-  BeforeSave,
-} from "sequelize-typescript";
+import { Table, Column, DataType, Model } from "sequelize-typescript";
 
 @Table({
   updatedAt: false,
 })
-class Contracts extends Model<Contracts> {
+class Collections extends Model<Collections> {
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
@@ -59,10 +52,10 @@ class Contracts extends Model<Contracts> {
   image_url: string;
 
   static getContractsByUserId(id) {
-    return Contracts.findAll({
+    return Collections.findAll({
       where: { user_id: id },
     });
   }
 }
 
-export default Contracts;
+export default Collections;

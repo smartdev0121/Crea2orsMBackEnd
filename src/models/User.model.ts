@@ -19,6 +19,11 @@ export enum UserRoles {
 })
 class User extends Model<User> {
   @Column({
+    allowNull: true,
+  })
+  wallet_address: string;
+
+  @Column({
     allowNull: false,
     unique: true,
   })
@@ -32,12 +37,12 @@ class User extends Model<User> {
   @Column({
     allowNull: true,
   })
-  customUrl: string;
+  custom_url: string;
 
   @Column({
     allowNull: true,
   })
-  personalSite: string;
+  personal_site: string;
 
   @Column({
     allowNull: false,
@@ -58,10 +63,10 @@ class User extends Model<User> {
   @Column({
     allowNull: false,
   })
-  nickName: string;
+  nick_name: string;
 
   get fullName() {
-    return `${this.nickName}`;
+    return `${this.nick_name}`;
   }
 
   @Column({
@@ -98,11 +103,12 @@ class User extends Model<User> {
     return {
       id: this.id,
       email: this.email,
-      nickName: this.nickName,
+      nickName: this.nick_name,
+      walletAddress: this.wallet_address,
       role: this.role,
       bio: this.bio,
-      customUrl: this.customUrl,
-      personalSite: this.personalSite,
+      customUrl: this.custom_url,
+      personalSite: this.personal_site,
       avatar_url: this.avatar_url,
       verified: this.verified,
       backgroundImageUrl: this.background_image_url,
@@ -119,7 +125,7 @@ class User extends Model<User> {
 
   static findByCustomUrl(url) {
     return User.findOne({
-      where: { customUrl: url },
+      where: { custom_url: url },
     });
   }
 

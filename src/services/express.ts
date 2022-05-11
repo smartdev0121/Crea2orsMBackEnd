@@ -6,12 +6,12 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import { errorHandler as queryErrorHandler } from "querymen";
 import { errorHandler as bodyErrorHandler } from "bodymen";
-
+import listenAuctionTime from "./listenAuctionTime";
 var upload = multer();
 
 export default (routes) => {
   const app = express();
-
+  listenAuctionTime();
   //if (process.env.NODE_ENV === "production") {
   app.use(cors());
   //}

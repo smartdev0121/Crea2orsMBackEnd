@@ -1,9 +1,9 @@
 import { body as bodyCheck } from "express-validator";
 import { validator } from "../helpers/decorators";
-import User, { UserRoles } from "../models/User.model";
+import User from "../models/User.model";
 
 export default class ProfileController {
-  static async info(req, res) {
+  static async info(req: any, res: any) {
     let user = null;
 
     try {

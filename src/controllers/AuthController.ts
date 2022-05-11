@@ -3,9 +3,6 @@ import { body as bodyCheck } from "express-validator";
 import config from "../config";
 import { validator } from "../helpers/decorators";
 import User from "../models/User.model";
-import { sendCode, verifyCode } from "email-verification-code";
-import { send } from "process";
-import { sendMail } from "../services/sendgrid";
 import { sendMailGun } from "src/services/mailgun";
 
 export default class AuthController {
@@ -13,7 +10,7 @@ export default class AuthController {
     bodyCheck("email").exists().isEmail(),
     bodyCheck("password").exists(),
   ])
-  static async login(req, res) {
+  static async login(req: any, res: any) {
     const { email, password } = req.body;
     const user = await User.findOne({
       where: { email },
@@ -30,7 +27,7 @@ export default class AuthController {
     res.json({ token });
   }
 
-  static async forgotPassword(req, res) {
+  static async forgotPassword(req: any, res: any) {
     const { email } = req.body;
     sendMailGun(email, "Reset Password", "userRegisterSuccess", {
       name: req.user.nickName,
@@ -41,7 +38,7 @@ export default class AuthController {
     res.json("success");
   }
 
-  static async resetPassword(req, res) {
+  static async resetPassword(req: any, res: any) {
     const { password, email } = req.body;
     const user = await User.findByEmail(email);
     if (!user) {

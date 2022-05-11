@@ -3,7 +3,7 @@ import Followers from "../models/Followers.model";
 import Followings from "../models/Followings.model";
 
 export default class FollowController {
-  static async delete(req, res) {
+  static async delete(req: any, res: any) {
     const email = req.body.email;
     const curUserId = req.user.id;
     const user = await User.findByEmail(email);
@@ -11,28 +11,26 @@ export default class FollowController {
 
     const follower = await Followers.findOne({
       where: { follower_id: curUserId, user_id: id },
-    }).then((result) => {
-      return Followers.destroy({
+    }).then(async (result) => {
+      const u = await Followers.destroy({
         where: { follower_id: curUserId, user_id: id },
-      }).then((u) => {
-        return result;
       });
+      return result;
     });
 
     const following = await Followings.findOne({
       where: { user_id: curUserId, following_id: id },
-    }).then((result) => {
-      return Followings.destroy({
+    }).then(async (result) => {
+      const u = await Followings.destroy({
         where: { user_id: curUserId, following_id: id },
-      }).then((u) => {
-        return result;
       });
+      return result;
     });
 
     res.json({ follower: follower });
   }
 
-  static async insert(req, res) {
+  static async insert(req: any, res: any) {
     const email = req.body.email;
     const curUserId = req.user.id;
     const user = await User.findByEmail(email);

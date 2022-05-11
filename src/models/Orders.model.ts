@@ -38,19 +38,19 @@ class Orders extends Model<Orders> {
 
   @Column({
     allowNull: false,
-    type: DataType.INTEGER,
+    type: DataType.FLOAT,
   })
   price: number;
 
   @Column({
     allowNull: false,
-    type: DataType.INTEGER,
+    type: DataType.BIGINT,
   })
   start_time: number;
 
   @Column({
     allowNull: false,
-    type: DataType.INTEGER,
+    type: DataType.BIGINT,
   })
   end_time: number;
 
@@ -65,14 +65,26 @@ class Orders extends Model<Orders> {
 
   @Column({
     allowNull: false,
-    type: DataType.INTEGER
+    type: DataType.FLOAT,
   })
-  max_bid_price: number;
+  buyer_price: number;
+
+  @Column({
+    allowNull: false,
+  })
+  buyer_address: string;
+
+  @Column({
+    allowNull: false,
+    type: DataType.INTEGER,
+    defaultValue: 1,
+  })
+  status: number;
 
   @BelongsTo(() => User, { onDelete: "CASCADE" })
   User: User;
 
-  toJSON () {
+  toJSON() {
     return {
       id: this.id,
       nftId: this.nft_id,
@@ -82,12 +94,12 @@ class Orders extends Model<Orders> {
       price: this.price,
       startTime: this.start_time,
       endTime: this.end_time,
-      maxBidPrice: this.max_bid_price,
+      maxBidPrice: this.buyer_price,
+      buyerAddress: this.buyer_address,
       orderType: this.order_type,
       User: this.User,
-    }
+    };
   }
-
 }
 
 export default Orders;

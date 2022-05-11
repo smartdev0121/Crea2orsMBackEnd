@@ -10,7 +10,9 @@ const sequelize = new Sequelize({
   modelPaths: [__dirname + "/**/*.model.{ts, js}"],
   logging: false,
 });
-
-sequelize.sync();
+sequelize
+  .sync({ force: false })
+  .then((res) => {})
+  .catch((err) => console.log("==========", err));
 
 export default sequelize;
