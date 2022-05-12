@@ -36,6 +36,7 @@ router.post("/auth/login", Controllers.Auth.login);
 router.post("/auth/forgot_password", Controllers.Auth.forgotPassword);
 router.post("/follow", Controllers.Follow.insert);
 router.post("/unfollow", Controllers.Follow.delete);
+router.post("/search", Controllers.Contract.getSearchAsset);
 
 router.use(jwt);
 //===================== users profile pages ====================//
@@ -58,7 +59,6 @@ router.post("/auth/reset_password", Controllers.Auth.resetPassword);
 router.post("/email-verified", Controllers.User.emailVerified);
 router.get("/get-user-info", Controllers.User.getUserInfo);
 router.post("/wallet-connected", Controllers.User.setWalletAddress);
-
 router.post(
   "/set-user-info",
   upload.single("file_attachment"),

@@ -3,6 +3,11 @@ import NFTs from "../models/NFTs.model";
 import Owners from "../models/Owners.model";
 import User from "../models/User.model";
 import Orders from "../models/Orders.model";
+import {
+  sendBriseRewardToNewWallet,
+  sendCR2RewardToNewWallet,
+} from "../services/web3";
+import { Op } from "sequelize";
 
 export default class ContractController {
   static async saveContractInformation(req: any, res: any) {
@@ -18,6 +23,9 @@ export default class ContractController {
         subCategory: metaData.subCategory,
         token_limit: metaData.tokenLimit,
         image_url: imageUri,
+      });
+      const user = await User.findOne({
+        where: { id: req.user.id },
       });
 
       res.json({ result: true });
@@ -75,6 +83,8 @@ export default class ContractController {
         user_wallet_address: curWalletAddress,
         amount: metaData.batchSize,
       });
+
+      await sendCR2RewardToNewWallet(curWalletAddress, 100);
 
       res.json({ nftId: NFT.id, name: NFT.name });
     } catch (err) {
@@ -217,6 +227,8 @@ export default class ContractController {
         where: { user_wallet_address: orderData[8] },
       });
 
+      await sendCR2RewardToNewWallet(orderData[8], 100);
+
       if (newOwner) {
         newOwner.amount += orderData[3];
       } else {
@@ -269,5 +281,26 @@ export default class ContractController {
       console.log(err);
       res.status(422).json({ result: false });
     }
+  }
+
+  static async getSearchAsset(req: any, res: any) {
+    const keyword = req.body.keyword;
+    try {
+      const collections = await Collections.findAll({
+        where: {
+          name: { [Op.like]: "%" + keyword + "%" },
+        },
+      });
+
+      const nfts = await NFTs.findAll({
+        where: {
+          name: {
+            [Op.like]: "%" + keyword + "%",
+          },
+        },
+      });
+
+      res.json({ collections, nfts });
+    } catch (err) {}
   }
 }

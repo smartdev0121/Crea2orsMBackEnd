@@ -5,7 +5,6 @@ import NFTs from "src/models/NFTs.model";
 
 export default async () => {
   const orders = await Orders.findAll();
-
   setTimeout(async () => {
     const curMiliTime = new Date().getTime();
     const curTime = Math.round(curMiliTime / 1000);
