@@ -50,6 +50,7 @@ router.post("/order-finalized", Controllers.Contract.orderFinalized);
 router.post("/new-bid-placed", Controllers.Contract.newBidPlaced);
 router.post("/order-created", Controllers.Contract.orderCreated);
 router.get("/get-orders/:nftId", Controllers.Contract.getOrders);
+router.get("/get-user-nfts", Controllers.Contract.getUserNfts);
 router.post("/cancel-order", Controllers.Contract.cancelOrder);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 

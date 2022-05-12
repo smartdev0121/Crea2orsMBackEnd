@@ -138,6 +138,7 @@ export default class ContractController {
     try {
       const order = await Orders.create({
         nft_id: nftId,
+        contract_nft_id: orderData._tokenId,
         creator_id: req.user.id,
         creator_address: orderData._creator,
         amount: orderData._amount,
@@ -251,6 +252,19 @@ export default class ContractController {
         include: [User],
       });
       res.json({ ordersData });
+    } catch (err) {
+      console.log(err);
+      res.status(422).json({ result: false });
+    }
+  }
+
+  static async getUserNfts(req, res) {
+    try {
+      const userNfts = await Owners.findAll({
+        where: { user_id: req.user.id },
+        include: [NFTs],
+      });
+      res.json({ userNfts });
     } catch (err) {
       console.log(err);
       res.status(422).json({ result: false });

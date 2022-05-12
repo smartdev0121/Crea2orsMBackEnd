@@ -6,12 +6,14 @@ import {
   BelongsTo,
   ForeignKey,
 } from "sequelize-typescript";
+import NFTs from "./NFTs.model";
 import User from "./User.model";
 
 @Table({
   updatedAt: false,
 })
 class Owners extends Model<Owners> {
+  @ForeignKey(() => NFTs)
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
@@ -39,6 +41,9 @@ class Owners extends Model<Owners> {
 
   @BelongsTo(() => User, { onDelete: "CASCADE" })
   User: User;
+
+  @BelongsTo(() => NFTs, "nft_id")
+  NFTs: NFTs;
 }
 
 export default Owners;

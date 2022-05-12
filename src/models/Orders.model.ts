@@ -18,6 +18,12 @@ class Orders extends Model<Orders> {
   })
   nft_id: number;
 
+  @Column({
+    allowNull: false,
+    type: DataType.INTEGER,
+  })
+  contract_nft_id: number;
+
   @ForeignKey(() => User)
   @Column({
     allowNull: false,
@@ -88,6 +94,7 @@ class Orders extends Model<Orders> {
     return {
       id: this.id,
       nftId: this.nft_id,
+      contractNftId: this.contract_nft_id,
       creatorId: this.creator_id,
       creatorAddress: this.creator_address,
       amount: this.amount,
