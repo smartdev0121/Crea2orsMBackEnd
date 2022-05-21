@@ -4,12 +4,12 @@ import { sendFinalizeOrderFunc, calculatePrice } from "src/services/web3";
 import NFTs from "src/models/NFTs.model";
 
 export default async () => {
-  const orders = await Orders.findAll();
-  setTimeout(async () => {
+  // const orders = await Orders.findAll();
+  const orders = [];
+
+  setInterval(async () => {
     const curMiliTime = new Date().getTime();
     const curTime = Math.round(curMiliTime / 1000);
-    console.log(curTime);
-
     orders
       .filter((item) => item.status == 1)
       .forEach(async (item) => {

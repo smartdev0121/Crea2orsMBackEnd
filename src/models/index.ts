@@ -10,9 +10,12 @@ const sequelize = new Sequelize({
   modelPaths: [__dirname + "/**/*.model.{ts, js}"],
   logging: false,
 });
-sequelize
-  .sync({ force: false })
-  .then((res) => {})
-  .catch((err) => console.log("==========", err));
-
+try {
+  sequelize
+    .sync({ force: false })
+    .then((res) => {})
+    .catch((err) => console.log("==========", err));
+} catch (err) {
+  console.log("servererror", err);
+}
 export default sequelize;

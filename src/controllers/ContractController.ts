@@ -301,6 +301,8 @@ export default class ContractController {
       });
 
       res.json({ collections, nfts });
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

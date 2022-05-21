@@ -3,7 +3,6 @@ import express from "./services/express";
 import routes from "./routes";
 import config from "./config";
 import "./models";
-import "./models/admin";
 
 const app = express(routes);
 const server = http.createServer(app);

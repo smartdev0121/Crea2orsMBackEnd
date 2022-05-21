@@ -1,5 +1,5 @@
 import Collections from "../../models/Collections.model";
-import Category from "../../models/admin/Category.model";
+import Category from "../../models/Category.model";
 import User from "src/models/User.model";
 import HomePage from "src/models/HomePage.model";
 

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { body as bodyCheck } from "express-validator";
 import config from "../../config";
 import { validator } from "../../helpers/decorators";
-import AdminUser from "../../models/admin/AdminUser.model";
+import AdminUser from "../../models/AdminUser.model";
 import { sendMailGun } from "src/services/mailgun";
 
 export default class AuthController {
