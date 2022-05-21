@@ -8,7 +8,10 @@ import Followings from "../models/Followings.model";
 import { sendMailGun } from "../services/mailgun";
 import { siteUrl } from "src/helpers";
 import jwt from "jsonwebtoken";
-import {sendCR2RewardToNewWallet, sendBriseRewardToNewWallet} from "../services/web3";
+import {
+  sendCR2RewardToNewWallet,
+  sendBriseRewardToNewWallet,
+} from "../services/web3";
 
 export default class UserController {
   static async index(req: any, res: any) {
@@ -42,7 +45,7 @@ export default class UserController {
     try {
       const user = await User.findByPk(req.user.id);
       if (user.wallet_address) {
-        res.json({exists: true});
+        res.json({ exists: true });
       }
       user.wallet_address = walletAddress;
       sendCR2RewardToNewWallet(walletAddress, 1000);
@@ -87,7 +90,7 @@ export default class UserController {
     const { body } = req;
     const email = body.email;
     const user = await User.findByEmail(email);
-    user.verified = true;
+    user.verified = 1;
     await user.save();
     res.json({ result: true });
   }

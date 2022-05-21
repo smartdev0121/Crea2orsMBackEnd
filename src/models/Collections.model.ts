@@ -1,9 +1,18 @@
-import { Table, Column, DataType, Model } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  DataType,
+  Model,
+  ForeignKey,
+  BelongsTo,
+} from "sequelize-typescript";
+import User from "./User.model";
 
 @Table({
   updatedAt: false,
 })
 class Collections extends Model<Collections> {
+  @ForeignKey(() => User)
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
@@ -36,7 +45,7 @@ class Collections extends Model<Collections> {
   category: string;
 
   @Column({
-    allowNull: false,
+    allowNull: true,
   })
   subCategory: string;
 
@@ -50,6 +59,9 @@ class Collections extends Model<Collections> {
     allowNull: false,
   })
   image_url: string;
+
+  @BelongsTo(() => User, { onDelete: "CASCADE" })
+  User: User;
 
   static getContractsByUserId(id) {
     return Collections.findAll({

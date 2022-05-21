@@ -71,8 +71,9 @@ class User extends Model<User> {
 
   @Column({
     defaultValue: false,
+    type: DataType.TINYINT,
   })
-  verified: boolean;
+  verified: number;
 
   @Column
   reset_token: string;

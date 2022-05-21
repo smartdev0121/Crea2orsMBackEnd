@@ -46,7 +46,7 @@ export default class AuthController {
     }
 
     user.password = password;
-    user.verified = true;
+    user.verified = 1;
     await user.save();
 
     const token = jwt.sign(user.toJSON(), config.APP_SECRET, {
