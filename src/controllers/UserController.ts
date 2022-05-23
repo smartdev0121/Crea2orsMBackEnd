@@ -46,11 +46,32 @@ export default class UserController {
       const user = await User.findByPk(req.user.id);
       if (user.wallet_address) {
         res.json({ exists: true });
+        return;
       }
       user.wallet_address = walletAddress;
-      sendCR2RewardToNewWallet(walletAddress, 1000);
-      sendBriseRewardToNewWallet(walletAddress, 1);
+      console.log("====================Here is CR2 supply================");
+      try {
+        const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
+        console.log("====================CR2 result", result);
+      } catch (err) {
+        res.json({ result: "cr2" });
+        console.log("====================CR2 result error", err);
+        return;
+      }
+      console.log("====================Here is BRISE supply================");
+      // res.json({ result: "cr2" });
+      try {
+        const result1 = await sendBriseRewardToNewWallet(walletAddress, 1);
+        console.log("====================Brise result", result1);
+      } catch (err) {
+        console.log("====================Brise result error", err);
+        res.json({ result: "brise" });
+        return;
+      }
+
+      // res.json({ result: "brise" });
       await user.save();
+      console.log("=================supply is ended======================");
       res.json({ exists: false });
     } catch (err) {
       console.log(err);
