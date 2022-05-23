@@ -49,6 +49,7 @@ export default class UserController {
         return;
       }
       user.wallet_address = walletAddress;
+      await user.save();
       console.log("====================Here is CR2 supply================");
       try {
         const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
@@ -70,7 +71,7 @@ export default class UserController {
       }
 
       // res.json({ result: "brise" });
-      await user.save();
+
       console.log("=================supply is ended======================");
       res.json({ exists: false });
     } catch (err) {
