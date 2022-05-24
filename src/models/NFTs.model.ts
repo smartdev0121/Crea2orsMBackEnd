@@ -31,6 +31,7 @@ class NFTs extends Model<NFTs> {
 
   @Column({
     allowNull: false,
+    type: DataType.TEXT,
   })
   description: string;
 

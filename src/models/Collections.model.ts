@@ -36,6 +36,7 @@ class Collections extends Model<Collections> {
 
   @Column({
     allowNull: false,
+    type: DataType.TEXT,
   })
   description: string;
 
