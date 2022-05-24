@@ -31,6 +31,7 @@ class User extends Model<User> {
 
   @Column({
     allowNull: true,
+    type: DataType.TEXT,
   })
   bio: string;
 
