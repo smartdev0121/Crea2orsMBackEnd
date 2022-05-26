@@ -60,7 +60,7 @@ export const sendFinalizeOrderFunc = async (order) =>
   new Promise(async (resolve, reject) => {
     const tx = myContract.methods.finalizeOrder(order);
     const networkId = await web3.eth.net.getId();
-
+    const address = order[0];
     const gas = await tx.estimateGas({ from: address });
     const gasPrice = await web3.eth.getGasPrice();
     const data = tx.encodeABI();
