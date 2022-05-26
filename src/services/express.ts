@@ -7,6 +7,7 @@ import multer from "multer";
 import { errorHandler as queryErrorHandler } from "querymen";
 import { errorHandler as bodyErrorHandler } from "bodymen";
 import listenAuctionTime from "./listenAuctionTime";
+const resolvePath = require("path").resolve;
 var upload = multer();
 
 export default (routes) => {
@@ -20,7 +21,10 @@ export default (routes) => {
 
   // app.use(express.static(`${__dirname}\public`));
   app.use(express.static("public"));
-
+  app.use(
+    "/images",
+    express.static(resolvePath(__dirname, "../../public/images"))
+  );
   app.use(bodyParser.json());
   app.use(routes);
   app.use(queryErrorHandler());
