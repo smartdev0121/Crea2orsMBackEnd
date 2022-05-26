@@ -118,7 +118,8 @@ export default class UserController {
   }
 
   static async emailVerify(req: any, res: any) {
-    const { email } = req.params.email;
+    const email = req.params.email;
+    console.log(email);
     const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
     const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
 
