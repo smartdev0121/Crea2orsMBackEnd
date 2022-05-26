@@ -7,9 +7,11 @@ import User from "../models/User.model";
 export default class ProfileController {
   static async info(req: any, res: any) {
     let user = null;
-
+    const walletAddress = req.params.walletAddress;
     try {
-      user = await User.findByPk(req.user.id);
+      user = await User.findOne({
+        where: { wallet_address: walletAddress },
+      });
     } catch (err) {
       res.json({ result: false });
     }

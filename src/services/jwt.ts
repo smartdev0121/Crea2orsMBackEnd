@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import config from "../config";
 
 export default (req, res, next) => {
-  let token;
+  let token: any;
   if (req.headers.authorization) {
     token = req.headers.authorization;
   } else if (req.query && req.query.token) {

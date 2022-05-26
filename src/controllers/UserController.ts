@@ -43,13 +43,22 @@ export default class UserController {
     const { walletAddress } = req.body;
     console.log("==============", req.body);
     try {
-      const user = await User.findByPk(req.user.id);
-      if (user.wallet_address) {
-        res.json({ exists: true });
+      const user = await User.findOne({
+        where: { wallet_address: walletAddress },
+      });
+
+      if (user) {
+        const token = jwt.sign(user.toJSON(), config.APP_SECRET, {
+          expiresIn: config.JWT_EXPIRE,
+        });
+        res.json({ token, user: user.toJSON() });
         return;
       }
-      user.wallet_address = walletAddress;
-      await user.save();
+      const newUser = await User.create({ wallet_address: walletAddress });
+      const token = jwt.sign(newUser.toJSON(), config.APP_SECRET, {
+        expiresIn: config.JWT_EXPIRE,
+      });
+      res.json({ token, user: user.toJSON() });
       console.log("====================Here is CR2 supply================");
       try {
         const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
@@ -108,6 +117,19 @@ export default class UserController {
     res.json(user);
   }
 
+  static async emailVerify(req: any, res: any) {
+    const { email } = req.params.email;
+    const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
+    const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
+
+    sendMailGun(email, "Confirm Email", "emailConfirm", {
+      name: "User",
+      url: confirmUrl,
+    });
+
+    res.json({});
+  }
+
   static async emailVerified(req: any, res: any) {
     const { body } = req;
     const email = body.email;
@@ -135,7 +157,11 @@ export default class UserController {
 
   static updateProfileBackground = async (req: any, res: any) => {
     const { file } = req;
-    const user = await User.findByPk(req.user.id);
+    const { walletAddress } = req.body;
+    console.log(file, walletAddress);
+    const user = await User.findOne({
+      where: { wallet_address: walletAddress || "" },
+    });
     user.background_image_url = file.filename;
     await user.save();
     res.json({ ...user.toJSON() });
@@ -155,22 +181,16 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
-
-    const user = await User.findByEmail(body.email);
-
-    if (user && body.email !== req.user.email) {
-      res.status(422).json({ email: "duplicates" });
-      return;
-    }
-
+    console.log(body);
+    const user = await User.findByPk(req.user.id);
+    user.nick_name = body.nick_name;
     user.custom_url = body.customUrl;
     user.bio = body.bio;
     user.personal_site = body.personalSite;
-
+    user.email = body.email;
     if (JSON.parse(body.handled)) user.avatar_url = file.filename;
-    try {
-      await user.save();
-    } catch (err) {}
+    await user.save();
+
     res.json(user);
   }
 

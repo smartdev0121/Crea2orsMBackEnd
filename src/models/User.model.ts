@@ -19,12 +19,12 @@ export enum UserRoles {
 })
 class User extends Model<User> {
   @Column({
-    allowNull: true,
+    allowNull: false,
   })
   wallet_address: string;
 
   @Column({
-    allowNull: false,
+    allowNull: true,
     unique: true,
   })
   email: string;
@@ -46,7 +46,7 @@ class User extends Model<User> {
   personal_site: string;
 
   @Column({
-    allowNull: false,
+    allowNull: true,
   })
   password: string;
 
@@ -62,7 +62,7 @@ class User extends Model<User> {
   role: UserRoles;
 
   @Column({
-    allowNull: false,
+    allowNull: true,
   })
   nick_name: string;
 
@@ -97,7 +97,7 @@ class User extends Model<User> {
   @Column
   verification_token: string;
 
-  validPassword(password) {
+  validPassword(password: string) {
     return bcrypt.compareSync(password, this.password);
   }
 

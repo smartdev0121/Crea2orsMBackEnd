@@ -46,13 +46,14 @@ router.use(jwt);
 //===================== users profile pages ====================//
 
 router.get("/cr2_apis/custom/:custom_url", Controllers.User.goProfilePage);
+router.get("/cr2_apis/email-verify/:email", Controllers.User.emailVerify);
 router.get(
   "/cr2_apis/contract/:contractAddress",
   Controllers.Contract.getContractUri
 );
 router.post("/cr2_apis/create-nft", Controllers.Contract.createNFT);
 router.get("/cr2_apis/get-nft/:nftId", Controllers.Contract.getNFT);
-router.get("/cr2_apis/profile/info", Controllers.Profile.info);
+router.get("/cr2_apis/profile/info/:walletAddress", Controllers.Profile.info);
 router.get(
   "/cr2_apis/get-user-collections",
   Controllers.Contract.getUserCollections
