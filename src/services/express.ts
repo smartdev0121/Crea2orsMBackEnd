@@ -22,7 +22,7 @@ export default (routes) => {
   // app.use(express.static(`${__dirname}\public`));
   app.use(express.static("public"));
   app.use(
-    "/images",
+    "/cr2_apis/images",
     express.static(resolvePath(__dirname, "../../public/images"))
   );
   app.use(bodyParser.json());
