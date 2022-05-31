@@ -4,8 +4,8 @@ import { sendFinalizeOrderFunc, calculatePrice } from "src/services/web3";
 import NFTs from "src/models/NFTs.model";
 
 export default async () => {
-  const orders = await Orders.findAll();
-  // const orders = [];
+  // const orders = await Orders.findAll();
+  const orders = [];
 
   setInterval(async () => {
     const curMiliTime = new Date().getTime();
