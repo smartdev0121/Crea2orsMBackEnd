@@ -49,6 +49,7 @@ class NFTs extends Model<NFTs> {
 
   @Column({
     allowNull: true,
+    type: DataType.TEXT,
   })
   alter_text: string;
 
