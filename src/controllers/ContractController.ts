@@ -68,11 +68,13 @@ export default class ContractController {
     } = req.body;
     console.log("curWall", curWalletAddress);
     try {
-      const nfts = await NFTs.findAll({where: {contract_id: contractId}});
+      const nfts = await NFTs.findAll({ where: { contract_id: contractId } });
       const nftId = nfts[nfts.length - 1]?.id ? nfts[nfts.length - 1]?.id : 0;
-      const collection = await Collections.findOne({where: {id: contractId}});
-      if(nftId > collection.token_limit) {
-        res.json({over: collection.token_limit});
+      const collection = await Collections.findOne({
+        where: { id: contractId },
+      });
+      if (nftId > collection.token_limit) {
+        res.json({ over: collection.token_limit });
         return;
       }
       console.log("NFT number", nftId);
@@ -199,7 +201,7 @@ export default class ContractController {
     console.log(nftId);
     try {
       const ordersData = await LazyOrders.findAll({
-        where: { status: 1, nft_id: nftId },
+        where: { status: 1, nftId: nftId },
         include: [User],
       });
       console.log(ordersData);
