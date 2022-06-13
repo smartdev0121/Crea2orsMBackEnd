@@ -55,6 +55,12 @@ class NFTs extends Model<NFTs> {
 
   @Column({
     allowNull: false,
+    type: DataType.TEXT,
+  })
+  signature: string;
+
+  @Column({
+    allowNull: false,
     type: DataType.INTEGER,
   })
   royalty_fee: number;

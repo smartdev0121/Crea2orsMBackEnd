@@ -3,6 +3,8 @@ import NFTs from "../models/NFTs.model";
 import Owners from "../models/Owners.model";
 import User from "../models/User.model";
 import Orders from "../models/Orders.model";
+import LazyOrders from "../models/LazyOrdes.model";
+
 import {
   sendBriseRewardToNewWallet,
   sendCR2RewardToNewWallet,
@@ -59,11 +61,21 @@ export default class ContractController {
       metaData,
       metaDataUri,
       fileUri,
-      nftId,
+      price,
+      // nftId,
+      signature,
       curWalletAddress,
     } = req.body;
     console.log("curWall", curWalletAddress);
     try {
+      const nfts = await NFTs.findAll({where: {contract_id: contractId}});
+      const nftId = nfts[nfts.length - 1]?.id ? nfts[nfts.length - 1]?.id : 0;
+      const collection = await Collections.findOne({where: {id: contractId}});
+      if(nftId > collection.token_limit) {
+        res.json({over: collection.token_limit});
+        return;
+      }
+      console.log("NFT number", nftId);
       const NFT = await NFTs.create({
         contract_id: contractId,
         metadata_url: metaDataUri,
@@ -73,16 +85,27 @@ export default class ContractController {
         alter_text: metaData.alterText,
         royalty_fee: metaData.royaltyFee,
         nft_id: nftId,
+        signature: signature,
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
       });
 
       await Owners.create({
-        nft_id: nftId,
+        nft_id: NFT.id,
         user_id: req.user.id,
         user_wallet_address: curWalletAddress,
         amount: metaData.batchSize,
       });
+
+      if (price != -1) {
+        LazyOrders.create({
+          maker_address: curWalletAddress,
+          nftId: NFT.id,
+          amount: metaData.batchSize,
+          price: price,
+          status: 1,
+        });
+      }
 
       await sendCR2RewardToNewWallet(curWalletAddress, 100);
 
@@ -175,7 +198,7 @@ export default class ContractController {
     const nftId = req.params.nftId;
     console.log(nftId);
     try {
-      const ordersData = await Orders.findAll({
+      const ordersData = await LazyOrders.findAll({
         where: { status: 1, nft_id: nftId },
         include: [User],
       });
