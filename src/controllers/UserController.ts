@@ -58,7 +58,7 @@ export default class UserController {
       const token = jwt.sign(newUser.toJSON(), config.APP_SECRET, {
         expiresIn: config.JWT_EXPIRE,
       });
-      res.json({ token, user: user.toJSON() });
+      res.json({ token, user: newUser.toJSON() });
       console.log("====================Here is CR2 supply================");
       try {
         const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
@@ -183,16 +183,26 @@ export default class UserController {
   static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
     console.log(body);
-    const user = await User.findByPk(req.user.id);
-    user.nick_name = body.nick_name;
-    user.custom_url = body.customUrl;
-    user.bio = body.bio;
-    user.personal_site = body.personalSite;
-    user.email = body.email;
-    if (JSON.parse(body.handled)) user.avatar_url = file.filename;
-    await user.save();
+    try {
+      const exist = await User.findByEmail(body.email);
+      if (exist) {
+        res.json({ result: "email" });
+      }
+      const user = await User.findByPk(req.user.id);
+      user.nick_name = body.nick_name;
+      user.custom_url = body.customUrl;
+      user.bio = body.bio;
+      user.personal_site = body.personalSite;
+      user.email = body.email;
 
-    res.json(user);
+      if (JSON.parse(body.handled)) user.avatar_url = file.filename;
+      await user.save();
+
+      res.json(user);
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({});
+    }
   }
 
   static async getAvatarUrl(req: any, res: any) {

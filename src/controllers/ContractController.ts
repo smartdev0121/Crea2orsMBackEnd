@@ -202,7 +202,7 @@ export default class ContractController {
     try {
       const ordersData = await LazyOrders.findAll({
         where: { status: 1, nftId: nftId },
-        include: [User],
+        // include: [User],
       });
       console.log(ordersData);
       res.json({ ordersData: ordersData });
