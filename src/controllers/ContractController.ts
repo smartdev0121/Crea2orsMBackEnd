@@ -106,6 +106,7 @@ export default class ContractController {
           amount: metaData.batchSize,
           price: price,
           status: 1,
+          user_id: req.user.id,
         });
       }
 

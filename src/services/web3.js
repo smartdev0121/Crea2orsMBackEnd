@@ -48,11 +48,11 @@ export const sendCR2RewardToNewWallet = async (newWalletAddress, amount) =>
       const receipt = await web3.eth.sendSignedTransaction(
         signedTx.rawTransaction
       );
-      return resolve({ result: true });
+      resolve({ result: true });
     } catch (err) {
-      console.log(">>>>>>>>>>>>>>>> cr2 error.................", err);
+      // console.log(">>>>>>>>>>>>>>>> cr2 error.................", err);
 
-      return reject({ result: false });
+      reject({ result: false });
     }
   });
 

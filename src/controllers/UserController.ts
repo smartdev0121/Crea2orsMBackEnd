@@ -64,8 +64,8 @@ export default class UserController {
         const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
         console.log("====================CR2 result", result);
       } catch (err) {
-        res.json({ result: "cr2" });
         console.log("====================CR2 result error", err);
+        // res.json({ result: "cr2" });
         return;
       }
       console.log("====================Here is BRISE supply================");
@@ -75,7 +75,7 @@ export default class UserController {
         console.log("====================Brise result", result1);
       } catch (err) {
         console.log("====================Brise result error", err);
-        res.json({ result: "brise" });
+        // res.json({ result: "brise" });
         return;
       }
 
