@@ -82,7 +82,7 @@ export default class UserController {
       // res.json({ result: "brise" });
 
       console.log("=================supply is ended======================");
-      res.json({ exists: false });
+      // res.json({ exists: false });
     } catch (err) {
       console.log(err);
       res.status(422).json({ result: false });
