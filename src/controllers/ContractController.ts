@@ -73,7 +73,7 @@ export default class ContractController {
       const collection = await Collections.findOne({
         where: { id: contractId },
       });
-      if (nftId > collection.token_limit) {
+      if (nfts.length >= collection.token_limit) {
         res.json({ over: collection.token_limit });
         return;
       }
