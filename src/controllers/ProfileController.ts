@@ -14,6 +14,7 @@ export default class ProfileController {
       });
     } catch (err) {
       res.json({ result: false });
+      return;
     }
     res.json({
       ...user.toJSON(),

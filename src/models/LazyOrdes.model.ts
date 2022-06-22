@@ -49,7 +49,7 @@ class LazyOrders extends Model<LazyOrders> {
   status: number;
 
   @BelongsTo(() => User, { onDelete: "CASCADE" })
-  User: User;
+  user: User;
 }
 
 export default LazyOrders;

@@ -170,20 +170,57 @@ export default class ContractController {
   }
 
   static async orderCreated(req: any, res: any) {
-    const { orderData, nftId } = req.body;
+    const { orderData } = req.body;
     try {
-      const order = await Orders.create({
-        nft_id: nftId,
-        contract_nft_id: orderData._tokenId,
-        creator_id: req.user.id,
-        creator_address: orderData._creator,
-        amount: orderData._amount,
-        price: orderData._price / Math.pow(10, 9),
-        start_time: orderData._startTime,
-        end_time: orderData._endTime,
-        order_type: orderData._orderType,
-        buyer_price: orderData._price / Math.pow(10, 9),
-        buyer_address: orderData._buyer,
+      // const order = await Orders.create({
+      //   nft_id: nftId,
+      //   contract_nft_id: orderData._tokenId,
+      //   creator_id: req.user.id,
+      //   creator_address: orderData._creator,
+      //   amount: orderData._amount,
+      //   price: orderData._price / Math.pow(10, 9),
+      //   start_time: orderData._startTime,
+      //   end_time: orderData._endTime,
+      //   order_type: orderData._orderType,
+      //   buyer_price: orderData._price / Math.pow(10, 9),
+      //   buyer_address: orderData._buyer,
+      // });
+      const ownerNft = await Owners.findOne({
+        where: { nft_id: orderData.nftDbId },
+      });
+
+      const prevOrders = await LazyOrders.findAll({
+        where: {
+          nftId: orderData.nftDbId,
+          status: 1,
+        },
+      });
+
+      if (prevOrders) {
+        let totalOrdersAmount = 0;
+        prevOrders.forEach((prevOrder) => {
+          totalOrdersAmount += prevOrder.amount;
+        });
+        console.log(
+          ownerNft.amount,
+          Number(totalOrdersAmount) + Number(orderData.amount)
+        );
+        if (
+          Number(ownerNft.amount) <
+          Number(totalOrdersAmount) + Number(orderData.amount)
+        ) {
+          res.json({ result: "overflow" });
+          return;
+        }
+      }
+
+      const order = await LazyOrders.create({
+        maker_address: orderData.maker_address,
+        user_id: orderData.user_id,
+        nftId: orderData.nftDbId,
+        amount: orderData.amount,
+        price: orderData.price,
+        status: 1,
       });
 
       if (!order) {
@@ -203,7 +240,7 @@ export default class ContractController {
     try {
       const ordersData = await LazyOrders.findAll({
         where: { status: 1, nftId: nftId },
-        // include: [User],
+        include: [User],
       });
       console.log(ordersData);
       res.json({ ordersData: ordersData });
@@ -216,9 +253,19 @@ export default class ContractController {
   static async cancelOrder(req: any, res: any) {
     const { id } = req.body;
     try {
-      const order = await Orders.update({ status: 0 }, { where: { id: id } });
+      // const order = await LazyOrders.update(
+      //   { status: 0 },
+      //   { where: { id: id } }
+      // );
+      const order = await LazyOrders.findOne({
+        where: { id: id },
+      });
+
+      order.status = 0;
+      order.save();
+
       if (order) {
-        res.json({ result: true });
+        res.json({ result: order.nftId });
       }
     } catch (err) {
       console.log(err);
