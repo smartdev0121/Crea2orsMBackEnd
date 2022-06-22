@@ -31,7 +31,14 @@ const upload = multer({
 });
 // 2
 const router = Router();
-
+router.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 router.post("/cr2_apis/users", Controllers.User.create);
 router.post("/cr2_apis/auth/login", Controllers.Auth.login);
 router.post("/cr2_apis/auth/forgot_password", Controllers.Auth.forgotPassword);

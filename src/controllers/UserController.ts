@@ -187,6 +187,7 @@ export default class UserController {
       const exist = await User.findByEmail(body.email);
       if (exist) {
         res.json({ result: "email" });
+        return;
       }
       const user = await User.findByPk(req.user.id);
       user.nick_name = body.nick_name;

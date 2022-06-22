@@ -16,6 +16,7 @@ export default (routes) => {
   //if (process.env.NODE_ENV === "production") {
   app.use(cors());
   //}
+
   app.use(compression());
   app.use(morgan("dev"));
 
