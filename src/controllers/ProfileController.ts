@@ -16,6 +16,11 @@ export default class ProfileController {
       res.json({ result: false });
       return;
     }
+
+    if (!user) {
+      res.json(null);
+      return;
+    }
     res.json({
       ...user.toJSON(),
     });

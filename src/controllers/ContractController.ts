@@ -121,21 +121,24 @@ export default class ContractController {
 
   static async getNFT(req: any, res: any) {
     const nftId = req.params.nftId;
+    console.log("/////////////////////////////////", nftId);
     try {
       const NFT = await NFTs.findOne({
         where: { id: nftId },
         include: [Collections],
       });
-
-      const owners = await Owners.findAll({
-        where: { nft_id: NFT.nft_id },
-        include: [User],
-      });
-
       if (!NFT) {
         res.status(422).json({ result: false });
         return;
       }
+
+      const owners = await Owners.findAll({
+        where: { nft_id: nftId },
+        include: [User],
+      });
+
+      console.log("OOOOOOOOOOOOOOOOOOOOOOOOO", owners.length);
+
       res.json({ ...NFT.toJSON(), owners });
     } catch (err) {
       console.log(err);
@@ -201,10 +204,7 @@ export default class ContractController {
         prevOrders.forEach((prevOrder) => {
           totalOrdersAmount += prevOrder.amount;
         });
-        console.log(
-          ownerNft.amount,
-          Number(totalOrdersAmount) + Number(orderData.amount)
-        );
+
         if (
           Number(ownerNft.amount) <
           Number(totalOrdersAmount) + Number(orderData.amount)
@@ -274,53 +274,142 @@ export default class ContractController {
   }
 
   static async orderFinalized(req: any, res: any) {
-    const { orderData, orderId, nftId } = req.body;
-
+    const { orderId, userId, amount } = req.body;
     try {
-      const order = await Orders.findOne({
+      console.log(1);
+      const order = await LazyOrders.findOne({
         where: { id: orderId },
       });
-
-      order.status = 0;
-      await order.save();
-
-      const previousOwner = await Owners.findOne({
-        where: { nft_id: nftId, user_wallet_address: orderData[0] },
+      console.log(2);
+      console.log({ nft_id: order.nftId, user_id: order.user_id });
+      const curUser = await User.findByPk(userId);
+      const prevOwner = await Owners.findOne({
+        where: { nft_id: order.nftId, user_id: order.user_id },
       });
-      previousOwner.amount == orderData[3]
-        ? await previousOwner.destroy()
-        : (previousOwner.amount -= orderData[3]);
+      console.log(3);
 
-      const user = await User.findOne({
-        where: { wallet_address: orderData[8] },
+      if (!prevOwner) {
+        res.status(401).json({ result: "Database error occurred!" });
+        return;
+      }
+      console.log(4);
+
+      if (order.amount < amount) {
+        res.status(401).json({ result: "Amount exceed" });
+        return;
+      }
+      console.log(5);
+
+      if (order.amount == amount) {
+        console.log(6);
+
+        await prevOwner.destroy();
+        order.status = 0;
+        await order.save();
+      } else {
+        console.log(7);
+
+        prevOwner.amount -= amount;
+        prevOwner.save();
+        order.amount -= amount;
+        order.save();
+      }
+      console.log(8);
+
+      const existOwner = await Owners.findOne({
+        where: {
+          user_id: userId,
+        },
       });
-      const userId = user.id;
+      console.log(9);
 
-      const newOwner = await Owners.findOne({
-        where: { user_wallet_address: orderData[8] },
-      });
+      if (existOwner) {
+        console.log(10);
 
-      await sendCR2RewardToNewWallet(orderData[8], 100);
-
-      if (newOwner) {
-        newOwner.amount += orderData[3];
+        existOwner.amount += amount;
+        await existOwner.save();
       } else {
         await Owners.create({
-          nft_id: nftId,
+          nft_id: order.nftId,
           user_id: userId,
-          user_wallet_address: orderData[8],
-          amount: orderData[3],
+          user_wallet_address: curUser.wallet_address,
+          amount: amount,
         });
+        console.log(11);
+      }
+      const ordersData = await LazyOrders.findAll({
+        where: {
+          nftId: order.nftId,
+          status: 1,
+        },
+      });
+
+      const NFT = await NFTs.findOne({
+        where: { id: order.nftId },
+        include: [Collections],
+      });
+      if (!NFT) {
+        res.status(422).json({ result: false });
+        return;
       }
 
-      const ordersData = await Orders.findAll({
-        where: { nft_id: nftId, status: 1 },
+      const owners = await Owners.findAll({
+        where: { nft_id: order.nftId },
+        include: [User],
       });
-      res.json({ ordersData });
+
+      res.json({ ordersData, nftInfo: { ...NFT.toJSON(), owners } });
     } catch (err) {
       console.log(err);
-      res.status(422).json({ result: false });
+      res.status(401).json({ result: err });
     }
+    // const { orderData, orderId, nftId } = req.body;
+
+    // try {
+    //   const order = await Orders.findOne({
+    //     where: { id: orderId },
+    //   });
+
+    //   order.status = 0;
+    //   await order.save();
+
+    //   const previousOwner = await Owners.findOne({
+    //     where: { nft_id: nftId, user_wallet_address: orderData[0] },
+    //   });
+    //   previousOwner.amount == orderData[3]
+    //     ? await previousOwner.destroy()
+    //     : (previousOwner.amount -= orderData[3]);
+
+    //   const user = await User.findOne({
+    //     where: { wallet_address: orderData[8] },
+    //   });
+    //   const userId = user.id;
+
+    //   const newOwner = await Owners.findOne({
+    //     where: { user_wallet_address: orderData[8] },
+    //   });
+
+    //   await sendCR2RewardToNewWallet(orderData[8], 100);
+
+    //   if (newOwner) {
+    //     newOwner.amount += orderData[3];
+    //   } else {
+    //     await Owners.create({
+    //       nft_id: nftId,
+    //       user_id: userId,
+    //       user_wallet_address: orderData[8],
+    //       amount: orderData[3],
+    //     });
+    //   }
+
+    //   const ordersData = await Orders.findAll({
+    //     where: { nft_id: nftId, status: 1 },
+    //   });
+    //   res.json({ ordersData });
+    // } catch (err) {
+    //   console.log(err);
+    //   res.status(422).json({ result: false });
+    // }
   }
 
   static async newBidPlaced(req, res) {
