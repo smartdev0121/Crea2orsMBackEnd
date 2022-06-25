@@ -6,7 +6,6 @@ var pusher = new Pusher({
   key: config.PUSHER_KEY,
   secret: config.PUSHER_SECRET,
   cluster: config.PUSHER_CLUSTER,
-  encrypted: true,
 });
 
 export default pusher;
