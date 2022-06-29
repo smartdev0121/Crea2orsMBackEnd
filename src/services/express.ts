@@ -27,7 +27,7 @@ export default (routes) => {
     express.static(resolvePath(__dirname, "../../public/images"))
   );
   app.use(bodyParser.json());
-  app.use(routes);
+  app.use("/", routes);
   app.use(queryErrorHandler());
   app.use(bodyErrorHandler());
 

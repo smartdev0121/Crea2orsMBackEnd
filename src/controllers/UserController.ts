@@ -52,6 +52,7 @@ export default class UserController {
           expiresIn: config.JWT_EXPIRE,
         });
         res.json({ token, user: user.toJSON() });
+        console.log("=============", walletAddress, token);
         return;
       }
       const newUser = await User.create({ wallet_address: walletAddress });
@@ -182,7 +183,7 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
-    console.log(body);
+    console.log(req);
     try {
       const exist = await User.findByEmail(body.email);
       if (exist) {
