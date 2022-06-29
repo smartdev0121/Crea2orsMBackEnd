@@ -55,7 +55,10 @@ export default class UserController {
         console.log("=============", walletAddress, token);
         return;
       }
-      const newUser = await User.create({ wallet_address: walletAddress });
+      const newUser = await User.create({
+        wallet_address: walletAddress,
+        custom_url: walletAddress,
+      });
       const token = jwt.sign(newUser.toJSON(), config.APP_SECRET, {
         expiresIn: config.JWT_EXPIRE,
       });
@@ -186,10 +189,6 @@ export default class UserController {
     console.log(req);
     try {
       const exist = await User.findByEmail(body.email);
-      if (exist) {
-        res.json({ result: "email" });
-        return;
-      }
       const user = await User.findByPk(req.user.id);
       user.nick_name = body.nick_name;
       user.custom_url = body.customUrl;
