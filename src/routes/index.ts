@@ -36,8 +36,7 @@ const router = Router();
 router.post("/cr2_apis/users", Controllers.User.create);
 router.post("/cr2_apis/auth/login", Controllers.Auth.login);
 router.post("/cr2_apis/auth/forgot_password", Controllers.Auth.forgotPassword);
-router.post("/cr2_apis/follow", Controllers.Follow.insert);
-router.post("/cr2_apis/unfollow", Controllers.Follow.delete);
+
 router.post("/cr2_apis/search", Controllers.Contract.getSearchAsset);
 //===========================admin router===============================//
 router.post("/cr2_apis/admin/users", AdminControllers.User.createUser);
@@ -52,7 +51,8 @@ router.post("/cr2_apis/wallet-connected", Controllers.User.setWalletAddress);
 
 router.use(jwt);
 //===================== users profile pages ====================//
-
+router.post("/cr2_apis/follow", Controllers.Follow.insert);
+router.post("/cr2_apis/unfollow", Controllers.Follow.delete);
 router.get("/cr2_apis/custom/:custom_url", Controllers.User.goProfilePage);
 router.get("/cr2_apis/email-verify/:email", Controllers.User.emailVerify);
 router.get(
@@ -81,7 +81,7 @@ router.use("/pusher/auth", Controllers.Pusher.auth);
 router.post("/cr2_apis/auth/reset_password", Controllers.Auth.resetPassword);
 router.post("/cr2_apis/email-verified", Controllers.User.emailVerified);
 router.get("/cr2_apis/get-user-info", Controllers.User.getUserInfo);
-
+router.post("/cr2_apis/reportpage", Controllers.Profile.reportPage);
 router.post(
   "/cr2_apis/set-user-info",
   upload.single("file_attachment"),
