@@ -48,8 +48,26 @@ export default class ContractController {
       where: { contract_id: contract.id },
     });
 
+    const lazyOrders = await LazyOrders.findAll({
+      where: { status: 1 },
+      include: NFTs,
+    });
+
+    const sellNFTs = lazyOrders.filter((sellNft, index) => {
+      for (const nft of nfts) {
+        if (nft.id === sellNft.nftId) {
+          return true;
+        }
+      }
+      return false;
+    });
+
     if (contract) {
-      res.json({ id: contract.id, contractUri: contract.contract_uri, nfts });
+      res.json({
+        id: contract.id,
+        contractUri: contract.contract_uri,
+        nfts: sellNFTs,
+      });
     } else {
       res.status(422).json({ result: false });
     }
