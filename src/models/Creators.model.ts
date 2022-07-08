@@ -3,40 +3,21 @@ import {
   Column,
   DataType,
   Model,
-  BelongsTo,
   ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
-import NFTs from "./NFTs.model";
 import User from "./User.model";
-
+import NFTs from "./NFTs.model";
 @Table({
   updatedAt: false,
 })
-class LazyOrders extends Model<LazyOrders> {
-  @Column({
-    allowNull: false,
-  })
-  maker_address: string;
-
+class Creators extends Model<Creators> {
   @ForeignKey(() => User)
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
   })
   user_id: number;
-
-  @ForeignKey(() => NFTs)
-  @Column({
-    allowNull: false,
-    type: DataType.INTEGER,
-  })
-  nftId: number;
-
-  @Column({
-    allowNull: false,
-    type: DataType.INTEGER,
-  })
-  amount: number;
 
   @Column({
     allowNull: false,
@@ -47,15 +28,28 @@ class LazyOrders extends Model<LazyOrders> {
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
-    defaultValue: 0,
   })
-  status: number;
+  collection_id: number;
 
-  @BelongsTo(() => NFTs, { onDelete: "CASCADE" })
-  nfts: NFTs;
+  @ForeignKey(() => NFTs)
+  @Column({
+    allowNull: false,
+    type: DataType.INTEGER,
+  })
+  nft_id: number;
+
+  @Column({
+    allowNull: false,
+    defaultValue: 0,
+    type: DataType.INTEGER,
+  })
+  minted_count: number;
 
   @BelongsTo(() => User, { onDelete: "CASCADE" })
   user: User;
+
+  @BelongsTo(() => NFTs, { onDelete: "CASCADE" })
+  nfts: NFTs;
 }
 
-export default LazyOrders;
+export default Creators;
