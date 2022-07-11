@@ -43,6 +43,13 @@ class NFTs extends Model<NFTs> {
 
   @Column({
     allowNull: false,
+    defaultValue: 0,
+    type: DataType.INTEGER,
+  })
+  minted_count: number;
+
+  @Column({
+    allowNull: false,
     type: DataType.INTEGER,
   })
   nft_id: number;

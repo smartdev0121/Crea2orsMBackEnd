@@ -76,6 +76,7 @@ router.post("/cr2_apis/order-created", Controllers.Contract.orderCreated);
 router.get("/cr2_apis/get-orders/:nftId", Controllers.Contract.getOrders);
 router.get("/cr2_apis/get-user-nfts", Controllers.Contract.getUserNfts);
 router.post("/cr2_apis/cancel-order", Controllers.Contract.cancelOrder);
+router.post("/cr2_apis/nft-minted", Controllers.Contract.nftMinted);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 
 router.post("/cr2_apis/auth/reset_password", Controllers.Auth.resetPassword);

@@ -38,13 +38,6 @@ class Creators extends Model<Creators> {
   })
   nft_id: number;
 
-  @Column({
-    allowNull: false,
-    defaultValue: 0,
-    type: DataType.INTEGER,
-  })
-  minted_count: number;
-
   @BelongsTo(() => User, { onDelete: "CASCADE" })
   user: User;
 
