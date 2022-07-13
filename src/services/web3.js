@@ -50,8 +50,6 @@ export const sendCR2RewardToNewWallet = async (newWalletAddress, amount) =>
       );
       resolve({ result: true });
     } catch (err) {
-      // console.log(">>>>>>>>>>>>>>>> cr2 error.................", err);
-
       reject({ result: false });
     }
   });
@@ -65,7 +63,6 @@ export const sendFinalizeOrderFunc = async (order) =>
     const gasPrice = await web3.eth.getGasPrice();
     const data = tx.encodeABI();
     const nounce = await web3.eth.getTransactionCount(address);
-    console.log(gas, gasPrice, nounce);
     const signedTx = await web3.eth.accounts.signTransaction(
       {
         to: marketContractAddress,
@@ -77,15 +74,12 @@ export const sendFinalizeOrderFunc = async (order) =>
       },
       privateKey
     );
-    console.log("MMMMMMMMMMMMMMMMMMMMM");
     const receipt = await web3.eth.sendSignedTransaction(
       signedTx.rawTransaction
     );
-    console.log(">>>>>>>>><<<<<<<<<<<<<<<<<", receipt);
     const events = await getEvent("OrderFinalized");
 
     const orderData = getEventValue(events);
-    console.log("Here is orderData>>>>>>>>>>>>>>>>", events);
     return resolve({});
   });
 
@@ -93,7 +87,6 @@ const getEvent = async (eventName) =>
   new Promise(async (resolve, reject) => {
     let latest_block = await web3.eth.getBlockNumber();
     let historical_block = latest_block - 10000;
-    console.log("Block number", latest_block, historical_block);
 
     const events = await myContract.getPastEvents(eventName, {
       fromBlock: historical_block,

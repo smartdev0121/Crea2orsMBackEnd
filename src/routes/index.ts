@@ -12,7 +12,6 @@ const multerStorage = multer.diskStorage({
     cb(null, "public");
   },
   filename: (req, file, cb) => {
-    console.log("storage", file);
     const ext = file.mimetype.split("/")[1];
     cb(null, `images/admin-${file.fieldname}-${Date.now()}.${ext}`);
   },

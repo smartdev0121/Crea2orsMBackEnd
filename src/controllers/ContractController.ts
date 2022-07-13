@@ -53,6 +53,7 @@ export default class ContractController {
       res.json({
         id: contract.id,
         contractUri: contract.contract_uri,
+        userId: contract.user_id,
         nfts,
       });
     } else {
@@ -249,7 +250,6 @@ export default class ContractController {
 
   static async getOrders(req: any, res: any) {
     const nftId = req.params.nftId;
-    console.log(nftId);
     try {
       const ordersData = await LazyOrders.findAll({
         where: { status: 1, nftId: nftId },
@@ -354,6 +354,7 @@ export default class ContractController {
       }
 
       if (order.amount == amount) {
+        prevOwner.destroy();
         order.status = 0;
         await order.save();
       } else {
