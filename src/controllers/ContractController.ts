@@ -75,7 +75,7 @@ export default class ContractController {
 
     try {
       const nfts = await NFTs.findAll({ where: { contract_id: contractId } });
-      const nftId = nfts[nfts.length - 1]?.id ? nfts[nfts.length - 1]?.id : 0;
+      const nftId = nfts ? nfts.length : 0;
       const collection = await Collections.findOne({
         where: { id: contractId },
       });
