@@ -94,6 +94,7 @@ export default class ContractController {
         alter_text: metaData.alterText,
         royalty_fee: metaData.royaltyFee,
         nft_id: nftId,
+        minted_count: 0,
         signature: signature,
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
