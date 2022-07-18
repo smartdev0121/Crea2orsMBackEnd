@@ -54,6 +54,7 @@ export default class ContractController {
         id: contract.id,
         contractUri: contract.contract_uri,
         userId: contract.user_id,
+        tokenLimit: contract.token_limit,
         nfts,
       });
     } else {
@@ -79,11 +80,12 @@ export default class ContractController {
       const collection = await Collections.findOne({
         where: { id: contractId },
       });
-
+      console.log("stage 1");
       if (nfts.length >= collection.token_limit) {
         res.json({ over: collection.token_limit });
         return;
       }
+      console.log("stage 2");
 
       const NFT = await NFTs.create({
         contract_id: contractId,
@@ -99,6 +101,7 @@ export default class ContractController {
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
       });
+      console.log("stage 3");
 
       // await Owners.create({
       //   nft_id: NFT.id,
@@ -112,6 +115,8 @@ export default class ContractController {
         user_id: req.user.id,
         price,
       });
+      console.log("stage 4");
+
       // if (price != -1) {
       //   await LazyOrders.create({
       //     maker_address: curWalletAddress,
@@ -123,7 +128,8 @@ export default class ContractController {
       //   });
       // }
 
-      await sendCR2RewardToNewWallet(curWalletAddress, 100);
+      const result = await sendCR2RewardToNewWallet(curWalletAddress, 100);
+      console.log("stage 5", result);
 
       res.json({ nftId: NFT.id, name: NFT.name });
     } catch (err) {

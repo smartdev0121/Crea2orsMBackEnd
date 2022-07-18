@@ -201,9 +201,9 @@ export default class UserController {
   static async goProfilePage(req: any, res: any) {
     const user = await User.findByCustomUrl(req.params.custom_url);
 
-    const followers = await Followers.findFollowersById(user.id);
-    const followings = await Followings.findFollowingsById(user.id);
     if (user) {
+      const followers = await Followers.findFollowersById(user.id);
+      const followings = await Followings.findFollowingsById(user.id);
       res.json({
         ...user.toJSON(),
         followers: followers,
