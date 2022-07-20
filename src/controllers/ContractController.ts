@@ -11,6 +11,7 @@ import {
 } from "../services/web3";
 import { Op } from "sequelize";
 import Creators from "src/models/Creators.model";
+import Activity from "src/models/Activity.model";
 
 export default class ContractController {
   static async saveContractInformation(req: any, res: any) {
@@ -29,6 +30,14 @@ export default class ContractController {
       });
       const user = await User.findOne({
         where: { id: req.user.id },
+      });
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Create",
+        target: "Collection (" + metaData.name + ")",
+        to_address: "",
+        image_url: imageUri,
       });
 
       res.json({ result: true });
@@ -80,12 +89,19 @@ export default class ContractController {
       const collection = await Collections.findOne({
         where: { id: contractId },
       });
-      console.log("stage 1");
+
       if (nfts.length >= collection.token_limit) {
         res.json({ over: collection.token_limit });
         return;
       }
-      console.log("stage 2");
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Create",
+        target: "NFT (" + metaData.name + ")",
+        to_address: "",
+        image_url: fileUri,
+      });
 
       const NFT = await NFTs.create({
         contract_id: contractId,
@@ -309,11 +325,12 @@ export default class ContractController {
         where: { user_id: req.user.id, nft_id: nftId },
       });
 
+      const user = await User.findOne({ where: { id: req.user.id } });
+
       if (ownerExist) {
         ownerExist.amount += amount;
         await ownerExist.save();
       } else {
-        const user = await User.findOne({ where: { id: req.user.id } });
         await Owners.create({
           nft_id: nftId,
           user_id: req.user.id,
@@ -321,6 +338,14 @@ export default class ContractController {
           amount: amount,
         });
       }
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Mint",
+        target: "NFT (" + nft.name + ")",
+        to_address: user.wallet_address,
+        image_url: nft.file_url,
+      });
 
       const owners = await Owners.findAll({
         where: { nft_id: nftId },
@@ -404,6 +429,14 @@ export default class ContractController {
         res.status(422).json({ result: false });
         return;
       }
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Transfer",
+        target: "NFT (" + NFT.name + ")",
+        to_address: curUser.wallet_address,
+        image_url: NFT.file_url,
+      });
 
       const owners = await Owners.findAll({
         where: { nft_id: order.nftId },

@@ -4,6 +4,12 @@ import Collections from "src/models/Collections.model";
 import { validator } from "../helpers/decorators";
 import User from "../models/User.model";
 import Report from "../models/Report.model";
+import NFTs from "../models/NFTs.model";
+import LazyOrders from "src/models/LazyOrdes.model";
+import stringify from "json-stringify-safe";
+import Owners from "src/models/Owners.model";
+import Creators from "src/models/Creators.model";
+import Activity from "src/models/Activity.model";
 
 export default class ProfileController {
   static async info(req: any, res: any) {
@@ -56,4 +62,83 @@ export default class ProfileController {
       res.status(401).json({ result: err });
     }
   }
+
+  static async getOnSale(req: any, res: any) {
+    const { collection, category } = req.body;
+    try {
+      const orders1 = await LazyOrders.findAll({
+        where: { status: 1, user_id: req.user.id },
+        include: [NFTs],
+      });
+
+      const newOrders = await getCollectionCategory(orders1);
+
+      res.json({ newOrders: stringify(newOrders) });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({ result: err });
+    }
+  }
+
+  static async getOwned(req: any, res: any) {
+    try {
+      const owner = await Owners.findAll({
+        where: { user_id: req.user.id },
+        include: [NFTs],
+      });
+
+      res.json({ owner });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({});
+    }
+  }
+
+  static async getCreated(req: any, res: any) {
+    try {
+      const creator = await Creators.findAll({
+        where: { user_id: req.user.id },
+        include: [NFTs],
+      });
+
+      res.json({ creator });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({});
+    }
+  }
+
+  static async getActivity(req: any, res: any) {
+    try {
+      const activity = await Activity.findAll({
+        where: { user_id: req.user.id },
+      });
+
+      res.json({ activity });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({});
+    }
+  }
 }
+
+const getCollectionCategory = (orders: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      let newOrders = [];
+
+      for (let item of orders) {
+        const collection = await Collections.findOne({
+          where: { id: item.nfts.contract_id },
+        });
+        newOrders.push({
+          ...item,
+          category_id: collection.category,
+        });
+      }
+
+      return resolve(newOrders);
+    } catch (err) {
+      return reject(err);
+    }
+  });

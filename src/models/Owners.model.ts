@@ -43,7 +43,7 @@ class Owners extends Model<Owners> {
   User: User;
 
   @BelongsTo(() => NFTs, "nft_id")
-  NFTs: NFTs;
+  nfts: NFTs;
 }
 
 export default Owners;

@@ -5,8 +5,10 @@ import {
   Model,
   BelongsTo,
   ForeignKey,
+  HasOne,
 } from "sequelize-typescript";
 import Contracts from "./Collections.model";
+import LazyOrders from "./LazyOrdes.model";
 
 @Table({
   updatedAt: false,
@@ -85,6 +87,7 @@ class NFTs extends Model<NFTs> {
   @BelongsTo(() => Contracts, { onDelete: "CASCADE" })
   Contracts: Contracts;
 
+  @HasOne(() => LazyOrders)
   toJSON() {
     return {
       id: this.id,

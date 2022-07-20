@@ -5,7 +5,9 @@ import {
   Model,
   BelongsTo,
   ForeignKey,
+  BelongsToMany,
 } from "sequelize-typescript";
+import Collections from "./Collections.model";
 import NFTs from "./NFTs.model";
 import User from "./User.model";
 

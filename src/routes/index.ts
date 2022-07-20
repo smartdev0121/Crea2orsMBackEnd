@@ -61,6 +61,11 @@ router.get(
 router.post("/cr2_apis/create-nft", Controllers.Contract.createNFT);
 router.get("/cr2_apis/get-nft/:nftId", Controllers.Contract.getNFT);
 router.get("/cr2_apis/profile/info/:walletAddress", Controllers.Profile.info);
+router.post("/cr2_apis/profile/onsale", Controllers.Profile.getOnSale);
+router.post("/cr2_apis/profile/owned", Controllers.Profile.getOwned);
+router.post("/cr2_apis/profile/created", Controllers.Profile.getCreated);
+router.post("/cr2_apis/profile/activity", Controllers.Profile.getActivity);
+
 router.get(
   "/cr2_apis/get-user-collections",
   Controllers.Contract.getUserCollections
