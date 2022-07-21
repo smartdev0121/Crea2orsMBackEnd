@@ -54,11 +54,10 @@ export default class ContractController {
       where: { contract_address: contractAddress },
     });
 
-    const nfts = await NFTs.findAll({
-      where: { contract_id: contract.id },
-    });
-
     if (contract) {
+      const nfts = await NFTs.findAll({
+        where: { contract_id: contract.id },
+      });
       res.json({
         id: contract.id,
         contractUri: contract.contract_uri,
@@ -78,7 +77,6 @@ export default class ContractController {
       metaDataUri,
       fileUri,
       price,
-      // nftId,
       signature,
       curWalletAddress,
     } = req.body;
@@ -131,7 +129,7 @@ export default class ContractController {
         user_id: req.user.id,
         price,
       });
-      console.log("stage 4");
+      console.log("stage 4", curWalletAddress);
 
       // if (price != -1) {
       //   await LazyOrders.create({
