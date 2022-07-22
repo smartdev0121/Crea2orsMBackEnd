@@ -12,7 +12,7 @@ const pk_RewardWallet =
 const pb_RewardWallet = "0x26810913499451a31a9E17C0b021b326C0a73c94";
 
 const cr2_contractAddress = "0xcaa395E63Eaf26bb65fF906ccC9F3752594b614B";
-const web3 = new Web3("https://serverrpc.com");
+const web3 = new Web3("https://chainrpc.com");
 
 const myContract = new web3.eth.Contract(abi, marketContractAddress);
 const cr2Contract = new web3.eth.Contract(cr2Abi, cr2_contractAddress);
