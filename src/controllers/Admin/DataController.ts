@@ -6,7 +6,6 @@ import HomePage from "src/models/HomePage.model";
 export default class DataController {
   static async fetchCollectionData(req: any, res: any) {
     const keyword = req.body.keyword;
-    console.log(keyword);
     try {
       if (keyword == "All") {
         const collections = await Collections.findAll({ include: [User] });
@@ -54,7 +53,6 @@ export default class DataController {
 
   static async deleteCategory(req: any, res: any) {
     const { id } = req.params;
-    console.log(id);
     try {
       await Category.destroy({ where: { id: id } });
       const categories = await Category.findAll();
@@ -67,7 +65,6 @@ export default class DataController {
 
   static async modeChanged(req: any, res: any) {
     const { option, type, collectionId } = req.body;
-    console.log(option, type, collectionId);
     try {
       if (option == "None") {
         await HomePage.destroy({

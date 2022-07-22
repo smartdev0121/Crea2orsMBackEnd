@@ -12,7 +12,6 @@ const multerStorage = multer.diskStorage({
     cb(null, "public");
   },
   filename: (req, file, cb) => {
-    console.log("storage", file);
     const ext = file.mimetype.split("/")[1];
     cb(null, `images/admin-${file.fieldname}-${Date.now()}.${ext}`);
   },
@@ -62,6 +61,11 @@ router.get(
 router.post("/cr2_apis/create-nft", Controllers.Contract.createNFT);
 router.get("/cr2_apis/get-nft/:nftId", Controllers.Contract.getNFT);
 router.get("/cr2_apis/profile/info/:walletAddress", Controllers.Profile.info);
+router.post("/cr2_apis/profile/onsale", Controllers.Profile.getOnSale);
+router.post("/cr2_apis/profile/owned", Controllers.Profile.getOwned);
+router.post("/cr2_apis/profile/created", Controllers.Profile.getCreated);
+router.post("/cr2_apis/profile/activity", Controllers.Profile.getActivity);
+
 router.get(
   "/cr2_apis/get-user-collections",
   Controllers.Contract.getUserCollections
@@ -76,6 +80,7 @@ router.post("/cr2_apis/order-created", Controllers.Contract.orderCreated);
 router.get("/cr2_apis/get-orders/:nftId", Controllers.Contract.getOrders);
 router.get("/cr2_apis/get-user-nfts", Controllers.Contract.getUserNfts);
 router.post("/cr2_apis/cancel-order", Controllers.Contract.cancelOrder);
+router.post("/cr2_apis/nft-minted", Controllers.Contract.nftMinted);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 
 router.post("/cr2_apis/auth/reset_password", Controllers.Auth.resetPassword);

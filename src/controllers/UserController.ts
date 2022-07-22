@@ -41,7 +41,6 @@ export default class UserController {
 
   static async setWalletAddress(req, res) {
     const { walletAddress } = req.body;
-    console.log("==============", req.body);
     try {
       const user = await User.findOne({
         where: { wallet_address: walletAddress },
@@ -52,7 +51,6 @@ export default class UserController {
           expiresIn: config.JWT_EXPIRE,
         });
         res.json({ token, user: user.toJSON() });
-        console.log("=============", walletAddress, token);
         return;
       }
       const newUser = await User.create({
@@ -63,29 +61,22 @@ export default class UserController {
         expiresIn: config.JWT_EXPIRE,
       });
       res.json({ token, user: newUser.toJSON() });
-      console.log("====================Here is CR2 supply================");
       try {
         const result = await sendCR2RewardToNewWallet(walletAddress, 1000);
-        console.log("====================CR2 result", result);
       } catch (err) {
-        console.log("====================CR2 result error", err);
         // res.json({ result: "cr2" });
         return;
       }
-      console.log("====================Here is BRISE supply================");
       // res.json({ result: "cr2" });
       try {
         const result1 = await sendBriseRewardToNewWallet(walletAddress, 1);
-        console.log("====================Brise result", result1);
       } catch (err) {
-        console.log("====================Brise result error", err);
         // res.json({ result: "brise" });
         return;
       }
 
       // res.json({ result: "brise" });
 
-      console.log("=================supply is ended======================");
       // res.json({ exists: false });
     } catch (err) {
       console.log(err);
@@ -100,7 +91,6 @@ export default class UserController {
   static async create(req: any, res: any) {
     const { body } = req;
     const email = body.email;
-    console.log("=================", body);
     const duplicates = await User.findByEmail(email);
     if (duplicates) {
       res.status(422).json({ email: "dupllicates" });
@@ -123,7 +113,6 @@ export default class UserController {
 
   static async emailVerify(req: any, res: any) {
     const email = req.params.email;
-    console.log(email);
     const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
     const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
 
@@ -163,7 +152,6 @@ export default class UserController {
   static updateProfileBackground = async (req: any, res: any) => {
     const { file } = req;
     const { walletAddress } = req.body;
-    console.log(file, walletAddress);
     const user = await User.findOne({
       where: { wallet_address: walletAddress || "" },
     });
@@ -186,7 +174,6 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
-    console.log(req);
     try {
       const exist = await User.findByEmail(body.email);
       const user = await User.findByPk(req.user.id);
@@ -214,9 +201,9 @@ export default class UserController {
   static async goProfilePage(req: any, res: any) {
     const user = await User.findByCustomUrl(req.params.custom_url);
 
-    const followers = await Followers.findFollowersById(user.id);
-    const followings = await Followings.findFollowingsById(user.id);
     if (user) {
+      const followers = await Followers.findFollowersById(user.id);
+      const followings = await Followings.findFollowingsById(user.id);
       res.json({
         ...user.toJSON(),
         followers: followers,

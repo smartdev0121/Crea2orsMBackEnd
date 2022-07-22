@@ -32,7 +32,6 @@ export default class AuthController {
 
   static async createUser(req: any, res: any) {
     const { values } = req.body;
-    console.log(values);
     const user = AdminUser.create({
       username: values.username,
       password: values.password,

@@ -3,23 +3,15 @@ import {
   Column,
   DataType,
   Model,
-  BelongsTo,
   ForeignKey,
+  BelongsTo,
 } from "sequelize-typescript";
-import NFTs from "./NFTs.model";
 import User from "./User.model";
-
+import NFTs from "./NFTs.model";
 @Table({
   updatedAt: false,
 })
-class Owners extends Model<Owners> {
-  @ForeignKey(() => NFTs)
-  @Column({
-    allowNull: false,
-    type: DataType.INTEGER,
-  })
-  nft_id: number;
-
+class Creators extends Model<Creators> {
   @ForeignKey(() => User)
   @Column({
     allowNull: false,
@@ -29,21 +21,28 @@ class Owners extends Model<Owners> {
 
   @Column({
     allowNull: false,
-    type: DataType.STRING,
+    type: DataType.INTEGER,
   })
-  user_wallet_address: string;
+  price: number;
 
   @Column({
     allowNull: false,
     type: DataType.INTEGER,
   })
-  amount: number;
+  collection_id: number;
+
+  @ForeignKey(() => NFTs)
+  @Column({
+    allowNull: false,
+    type: DataType.INTEGER,
+  })
+  nft_id: number;
 
   @BelongsTo(() => User, { onDelete: "CASCADE" })
-  User: User;
+  user: User;
 
-  @BelongsTo(() => NFTs, "nft_id")
+  @BelongsTo(() => NFTs, { onDelete: "CASCADE" })
   nfts: NFTs;
 }
 
-export default Owners;
+export default Creators;

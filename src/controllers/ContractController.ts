@@ -10,6 +10,8 @@ import {
   sendCR2RewardToNewWallet,
 } from "../services/web3";
 import { Op } from "sequelize";
+import Creators from "src/models/Creators.model";
+import Activity from "src/models/Activity.model";
 
 export default class ContractController {
   static async saveContractInformation(req: any, res: any) {
@@ -30,6 +32,14 @@ export default class ContractController {
         where: { id: req.user.id },
       });
 
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Create",
+        target: "Collection (" + metaData.name + ")",
+        to_address: "",
+        image_url: imageUri,
+      });
+
       res.json({ result: true });
     } catch (err) {
       console.log(err);
@@ -44,12 +54,17 @@ export default class ContractController {
       where: { contract_address: contractAddress },
     });
 
-    const nfts = await NFTs.findAll({
-      where: { contract_id: contract.id },
-    });
-
     if (contract) {
-      res.json({ id: contract.id, contractUri: contract.contract_uri, nfts });
+      const nfts = await NFTs.findAll({
+        where: { contract_id: contract.id },
+      });
+      res.json({
+        id: contract.id,
+        contractUri: contract.contract_uri,
+        userId: contract.user_id,
+        tokenLimit: contract.token_limit,
+        nfts,
+      });
     } else {
       res.status(422).json({ result: false });
     }
@@ -62,22 +77,30 @@ export default class ContractController {
       metaDataUri,
       fileUri,
       price,
-      // nftId,
       signature,
       curWalletAddress,
     } = req.body;
-    console.log("curWall", curWalletAddress);
+
     try {
       const nfts = await NFTs.findAll({ where: { contract_id: contractId } });
-      const nftId = nfts[nfts.length - 1]?.id ? nfts[nfts.length - 1]?.id : 0;
+      const nftId = nfts ? nfts.length : 0;
       const collection = await Collections.findOne({
         where: { id: contractId },
       });
+
       if (nfts.length >= collection.token_limit) {
         res.json({ over: collection.token_limit });
         return;
       }
-      console.log("NFT number", nftId);
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Create",
+        target: "NFT (" + metaData.name + ")",
+        to_address: "",
+        image_url: fileUri,
+      });
+
       const NFT = await NFTs.create({
         contract_id: contractId,
         metadata_url: metaDataUri,
@@ -87,30 +110,40 @@ export default class ContractController {
         alter_text: metaData.alterText,
         royalty_fee: metaData.royaltyFee,
         nft_id: nftId,
+        minted_count: 0,
         signature: signature,
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
       });
+      console.log("stage 3");
 
-      await Owners.create({
+      // await Owners.create({
+      //   nft_id: NFT.id,
+      //   user_id: req.user.id,
+      //   user_wallet_address: curWalletAddress,
+      //   amount: metaData.batchSize,
+      // });
+      const creator = await Creators.create({
         nft_id: NFT.id,
+        collection_id: contractId,
         user_id: req.user.id,
-        user_wallet_address: curWalletAddress,
-        amount: metaData.batchSize,
+        price,
       });
+      console.log("stage 4", curWalletAddress);
 
-      if (price != -1) {
-        LazyOrders.create({
-          maker_address: curWalletAddress,
-          nftId: NFT.id,
-          amount: metaData.batchSize,
-          price: price,
-          status: 1,
-          user_id: req.user.id,
-        });
-      }
+      // if (price != -1) {
+      //   await LazyOrders.create({
+      //     maker_address: curWalletAddress,
+      //     nftId: NFT.id,
+      //     amount: metaData.batchSize,
+      //     price: price,
+      //     status: 1,
+      //     user_id: req.user.id,
+      //   });
+      // }
 
-      await sendCR2RewardToNewWallet(curWalletAddress, 100);
+      const result = await sendCR2RewardToNewWallet(curWalletAddress, 100);
+      console.log("stage 5", result);
 
       res.json({ nftId: NFT.id, name: NFT.name });
     } catch (err) {
@@ -121,7 +154,6 @@ export default class ContractController {
 
   static async getNFT(req: any, res: any) {
     const nftId = req.params.nftId;
-    console.log("/////////////////////////////////", nftId);
     try {
       const NFT = await NFTs.findOne({
         where: { id: nftId },
@@ -137,9 +169,12 @@ export default class ContractController {
         include: [User],
       });
 
-      console.log("OOOOOOOOOOOOOOOOOOOOOOOOO", owners.length);
+      const creator = await Creators.findOne({
+        where: { nft_id: nftId },
+        include: [User, NFTs],
+      });
 
-      res.json({ ...NFT.toJSON(), owners });
+      res.json({ ...NFT.toJSON(), owners, creator });
     } catch (err) {
       console.log(err);
       res.status(422).json({ result: false });
@@ -236,11 +271,10 @@ export default class ContractController {
 
   static async getOrders(req: any, res: any) {
     const nftId = req.params.nftId;
-    console.log(nftId);
     try {
       const ordersData = await LazyOrders.findAll({
         where: { status: 1, nftId: nftId },
-        include: [User],
+        include: [User, NFTs],
       });
       console.log(ordersData);
       res.json({ ordersData: ordersData });
@@ -273,59 +307,101 @@ export default class ContractController {
     }
   }
 
+  static async nftMinted(req: any, res: any) {
+    const { nftId, amount } = req.body;
+    console.log(">>>>>>>>>>>>>", nftId, amount);
+    try {
+      const nft = await NFTs.findOne({
+        where: { id: nftId },
+        include: [Collections],
+      });
+
+      nft.minted_count += amount;
+      await nft.save();
+
+      const ownerExist = await Owners.findOne({
+        where: { user_id: req.user.id, nft_id: nftId },
+      });
+
+      const user = await User.findOne({ where: { id: req.user.id } });
+
+      if (ownerExist) {
+        ownerExist.amount += amount;
+        await ownerExist.save();
+      } else {
+        await Owners.create({
+          nft_id: nftId,
+          user_id: req.user.id,
+          user_wallet_address: user.wallet_address,
+          amount: amount,
+        });
+      }
+
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Mint",
+        target: "NFT (" + nft.name + ")",
+        to_address: user.wallet_address,
+        image_url: nft.file_url,
+      });
+
+      const owners = await Owners.findAll({
+        where: { nft_id: nftId },
+        include: [User],
+      });
+
+      const creator = await Creators.findOne({
+        where: { nft_id: nftId },
+        include: [User, NFTs],
+      });
+
+      res.json({ nftInfo: { ...nft.toJSON(), owners, creator } });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({ error: err });
+    }
+  }
+
   static async orderFinalized(req: any, res: any) {
     const { orderId, userId, amount } = req.body;
     try {
-      console.log(1);
       const order = await LazyOrders.findOne({
         where: { id: orderId },
       });
-      console.log(2);
-      console.log({ nft_id: order.nftId, user_id: order.user_id });
       const curUser = await User.findByPk(userId);
       const prevOwner = await Owners.findOne({
         where: { nft_id: order.nftId, user_id: order.user_id },
       });
-      console.log(3);
 
       if (!prevOwner) {
         res.status(401).json({ result: "Database error occurred!" });
         return;
       }
-      console.log(4);
 
       if (order.amount < amount) {
         res.status(401).json({ result: "Amount exceed" });
         return;
       }
-      console.log(5);
 
       if (order.amount == amount) {
-        console.log(6);
-
-        await prevOwner.destroy();
+        prevOwner.destroy();
         order.status = 0;
         await order.save();
       } else {
-        console.log(7);
-
         prevOwner.amount -= amount;
         prevOwner.save();
         order.amount -= amount;
         order.save();
       }
-      console.log(8);
 
       const existOwner = await Owners.findOne({
         where: {
           user_id: userId,
+          nft_id: order.nftId,
         },
       });
-      console.log(9);
 
       if (existOwner) {
-        console.log(10);
-
         existOwner.amount += amount;
         await existOwner.save();
       } else {
@@ -335,7 +411,6 @@ export default class ContractController {
           user_wallet_address: curUser.wallet_address,
           amount: amount,
         });
-        console.log(11);
       }
       const ordersData = await LazyOrders.findAll({
         where: {
@@ -353,63 +428,29 @@ export default class ContractController {
         return;
       }
 
+      await Activity.create({
+        user_id: req.user.id,
+        type: "Transfer",
+        target: "NFT (" + NFT.name + ")",
+        to_address: curUser.wallet_address,
+        image_url: NFT.file_url,
+      });
+
       const owners = await Owners.findAll({
         where: { nft_id: order.nftId },
         include: [User],
       });
 
-      res.json({ ordersData, nftInfo: { ...NFT.toJSON(), owners } });
+      const creator = await Creators.findOne({
+        where: { nft_id: order.nftId },
+        include: [User, NFTs],
+      });
+
+      res.json({ ordersData, nftInfo: { ...NFT.toJSON(), owners, creator } });
     } catch (err) {
       console.log(err);
       res.status(401).json({ result: err });
     }
-    // const { orderData, orderId, nftId } = req.body;
-
-    // try {
-    //   const order = await Orders.findOne({
-    //     where: { id: orderId },
-    //   });
-
-    //   order.status = 0;
-    //   await order.save();
-
-    //   const previousOwner = await Owners.findOne({
-    //     where: { nft_id: nftId, user_wallet_address: orderData[0] },
-    //   });
-    //   previousOwner.amount == orderData[3]
-    //     ? await previousOwner.destroy()
-    //     : (previousOwner.amount -= orderData[3]);
-
-    //   const user = await User.findOne({
-    //     where: { wallet_address: orderData[8] },
-    //   });
-    //   const userId = user.id;
-
-    //   const newOwner = await Owners.findOne({
-    //     where: { user_wallet_address: orderData[8] },
-    //   });
-
-    //   await sendCR2RewardToNewWallet(orderData[8], 100);
-
-    //   if (newOwner) {
-    //     newOwner.amount += orderData[3];
-    //   } else {
-    //     await Owners.create({
-    //       nft_id: nftId,
-    //       user_id: userId,
-    //       user_wallet_address: orderData[8],
-    //       amount: orderData[3],
-    //     });
-    //   }
-
-    //   const ordersData = await Orders.findAll({
-    //     where: { nft_id: nftId, status: 1 },
-    //   });
-    //   res.json({ ordersData });
-    // } catch (err) {
-    //   console.log(err);
-    //   res.status(422).json({ result: false });
-    // }
   }
 
   static async newBidPlaced(req, res) {
