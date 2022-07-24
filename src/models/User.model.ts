@@ -7,7 +7,10 @@ import {
   Model,
   BeforeSave,
   BeforeCreate,
+  HasMany,
 } from "sequelize-typescript";
+import Collections from "./Collections.model";
+import Owners from "./Owners.model";
 
 export enum UserRoles {
   ADMIN = "admin",
@@ -96,6 +99,12 @@ class User extends Model<User> {
 
   @Column
   verification_token: string;
+
+  @HasMany(() => Collections)
+  collections: Collections;
+
+  @HasMany(() => Owners)
+  owned: Owners;
 
   validPassword(password: string) {
     return bcrypt.compareSync(password, this.password);

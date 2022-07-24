@@ -44,7 +44,7 @@ class NFTs extends Model<NFTs> {
   batch_size: number;
 
   @Column({
-    allowNull: false,
+    allowNull: true,
     defaultValue: 0,
     type: DataType.INTEGER,
   })

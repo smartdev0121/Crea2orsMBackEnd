@@ -74,6 +74,9 @@ router.get(
   "/cr2_apis/get-all-collections",
   Controllers.Contract.getAllCollections
 );
+
+router.get("/cr2_apis/categories", Controllers.Contract.fetchCategories);
+
 router.post("/cr2_apis/order-finalized", Controllers.Contract.orderFinalized);
 router.post("/cr2_apis/new-bid-placed", Controllers.Contract.newBidPlaced);
 router.post("/cr2_apis/order-created", Controllers.Contract.orderCreated);
@@ -112,6 +115,7 @@ router.post(
   "/cr2_apis/admin/collections",
   AdminControllers.Data.fetchCollectionData
 );
+router.get("/cr2_apis/admin/users", AdminControllers.Data.fetchUsersData);
 router.get("/cr2_apis/admin/categories", AdminControllers.Data.getCategories);
 router.post("/cr2_apis/admin/new_category", AdminControllers.Data.newCategory);
 router.get(
