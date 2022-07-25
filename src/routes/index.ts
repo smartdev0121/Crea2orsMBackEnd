@@ -2,6 +2,7 @@ import express, { Router } from "express";
 import Controllers from "../controllers";
 import AdminControllers from "../controllers/Admin";
 import jwt from "../services/jwt";
+import * as middlewares from "./middlewares";
 import { storagePath } from "../helpers";
 // import * as middlewares from "./middlewares";
 // import { userRoles } from "../models/User.model";
@@ -114,7 +115,7 @@ router.post(
 );
 
 //===========================admin router===============================//
-
+router.use(middlewares.authenticate());
 router.get("/cr2_apis/admin/profile/info", AdminControllers.User.getProfile);
 router.post(
   "/cr2_apis/admin/collections",
