@@ -12,11 +12,26 @@ import {
 import { Op } from "sequelize";
 import Creators from "src/models/Creators.model";
 import Activity from "src/models/Activity.model";
+import Category from "src/models/Category.model";
 
 export default class ContractController {
   static async saveContractInformation(req: any, res: any) {
     const { contractUri, contractAddress, metaData, imageUri } = req.body;
     try {
+      console.log(metaData.category, metaData.subCategory);
+
+      const exist = await Category.findOne({
+        where: { name: metaData.subCategory },
+      });
+
+      const subCategory =
+        exist ||
+        (await Category.create({
+          name: metaData.subCategory,
+          parent_id: metaData.category,
+          icon_url: "",
+        }));
+
       const contract = await Collections.create({
         user_id: req.user.id,
         contract_address: contractAddress,
@@ -24,10 +39,11 @@ export default class ContractController {
         name: metaData.name,
         description: metaData.description,
         category: metaData.category,
-        subCategory: metaData.subCategory,
+        subCategory: subCategory.id,
         token_limit: metaData.tokenLimit,
         image_url: imageUri,
       });
+
       const user = await User.findOne({
         where: { id: req.user.id },
       });
@@ -307,6 +323,16 @@ export default class ContractController {
     }
   }
 
+  static async fetchCategories(req: any, res: any) {
+    try {
+      const categories = await Category.findAll();
+      res.json({ categories });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({ err });
+    }
+  }
+
   static async nftMinted(req: any, res: any) {
     const { nftId, amount } = req.body;
     console.log(">>>>>>>>>>>>>", nftId, amount);
@@ -331,6 +357,7 @@ export default class ContractController {
       } else {
         await Owners.create({
           nft_id: nftId,
+          collection_id: nft.contract_id,
           user_id: req.user.id,
           user_wallet_address: user.wallet_address,
           amount: amount,
@@ -407,6 +434,7 @@ export default class ContractController {
       } else {
         await Owners.create({
           nft_id: order.nftId,
+          collection_id: prevOwner.collection_id,
           user_id: userId,
           user_wallet_address: curUser.wallet_address,
           amount: amount,
