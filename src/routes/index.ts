@@ -46,6 +46,11 @@ router.get(
   Controllers.Profile.fetchHomepageContent
 );
 
+router.post(
+  "/cr2_apis/fetch_collections_by_category",
+  Controllers.Profile.fetchCollectionsByCategory
+);
+
 router.post("/cr2_apis/wallet-connected", Controllers.User.setWalletAddress);
 
 router.use(jwt);

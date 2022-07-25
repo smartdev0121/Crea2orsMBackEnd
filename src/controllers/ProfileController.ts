@@ -10,6 +10,7 @@ import stringify from "json-stringify-safe";
 import Owners from "src/models/Owners.model";
 import Creators from "src/models/Creators.model";
 import Activity from "src/models/Activity.model";
+import Category from "src/models/Category.model";
 
 export default class ProfileController {
   static async info(req: any, res: any) {
@@ -46,6 +47,41 @@ export default class ProfileController {
     } catch (err) {
       console.log(err);
       res.status(401).json({});
+    }
+  }
+
+  static async fetchCollectionsByCategory(req: any, res: any) {
+    const { id } = req.body;
+    try {
+      const category = await Category.findOne({ where: { id: id } });
+      if (!category) {
+        console.log("======================");
+        return res.json({ collectionsByCategory: [] });
+      }
+      let collectionsByCategory = [];
+
+      if (category.parent_id == 0) {
+        if (id == 1) {
+          collectionsByCategory = await Collections.findAll({
+            include: [NFTs],
+          });
+        } else {
+          collectionsByCategory = await Collections.findAll({
+            where: { category: id },
+            include: [NFTs],
+          });
+        }
+      } else {
+        collectionsByCategory = await Collections.findAll({
+          where: { subCategory: id, category: category.parent_id },
+          include: [NFTs],
+        });
+      }
+
+      res.json({ collectionsByCategory });
+    } catch (err) {
+      console.log(err);
+      return res.status(401).json({ result: err });
     }
   }
 
