@@ -47,7 +47,6 @@ export default class DataController {
       let arrCategories = [];
       const arrParentCty = await Category.findAll({ where: { parent_id: 0 } });
       for (const parentCty of arrParentCty) {
-        console.log("row", parentCty);
         const nodes = await getNodes(parentCty);
         arrCategories.push({
           id: parentCty.id,
@@ -55,7 +54,6 @@ export default class DataController {
           nodes,
         });
       }
-      console.log(arrCategories);
       res.json({ categories: arrCategories });
     } catch (err) {
       res.status(401).json({ result: false });
@@ -121,7 +119,6 @@ export default class DataController {
 
 const getNodes = (parent: any) =>
   new Promise(async (resolve, reject) => {
-    console.log("start");
     let returnArr = [];
     let arrNodes = await Category.findAll({ where: { parent_id: parent?.id } });
     if (arrNodes.length == 0) return resolve([]);

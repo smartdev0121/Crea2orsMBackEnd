@@ -151,7 +151,6 @@ export default class UserController {
 
   static updateProfileBackground = async (req: any, res: any) => {
     const { file } = req;
-    console.log(">>>>>>>>>>>>>>>>>>>>>>>>>", file);
     const { walletAddress } = req.body;
     const user = await User.findOne({
       where: { wallet_address: walletAddress || "" },
