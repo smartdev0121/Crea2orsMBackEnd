@@ -36,7 +36,6 @@ export default class ProfileController {
 
   static async fetchHomepageContent(req: any, res: any) {
     const { keyword } = req.params;
-    console.log(keyword);
     try {
       const contents = await HomePage.findAll({
         where: { category: keyword },
@@ -55,7 +54,6 @@ export default class ProfileController {
     try {
       const category = await Category.findOne({ where: { id: id } });
       if (!category) {
-        console.log("======================");
         return res.json({ collectionsByCategory: [] });
       }
       let collectionsByCategory = [];
@@ -87,7 +85,6 @@ export default class ProfileController {
 
   static async reportPage(req: any, res: any) {
     const { content } = req.body;
-    console.log(content);
     try {
       Report.create({
         user_id: req.user.id,

@@ -18,8 +18,6 @@ export default class ContractController {
   static async saveContractInformation(req: any, res: any) {
     const { contractUri, contractAddress, metaData, imageUri } = req.body;
     try {
-      console.log(metaData.category, metaData.subCategory);
-
       const exist = await Category.findOne({
         where: { name: metaData.subCategory },
       });
@@ -131,21 +129,13 @@ export default class ContractController {
         file_url: fileUri,
         traits: JSON.stringify(metaData.traits),
       });
-      console.log("stage 3");
 
-      // await Owners.create({
-      //   nft_id: NFT.id,
-      //   user_id: req.user.id,
-      //   user_wallet_address: curWalletAddress,
-      //   amount: metaData.batchSize,
-      // });
       const creator = await Creators.create({
         nft_id: NFT.id,
         collection_id: contractId,
         user_id: req.user.id,
         price,
       });
-      console.log("stage 4", curWalletAddress);
 
       // if (price != -1) {
       //   await LazyOrders.create({
@@ -159,7 +149,6 @@ export default class ContractController {
       // }
 
       const result = await sendCR2RewardToNewWallet(curWalletAddress, 100);
-      console.log("stage 5", result);
 
       res.json({ nftId: NFT.id, name: NFT.name });
     } catch (err) {
@@ -292,7 +281,6 @@ export default class ContractController {
         where: { status: 1, nftId: nftId },
         include: [User, NFTs],
       });
-      console.log(ordersData);
       res.json({ ordersData: ordersData });
     } catch (err) {
       res.status(422).json({ result: false });
@@ -335,7 +323,6 @@ export default class ContractController {
 
   static async nftMinted(req: any, res: any) {
     const { nftId, amount } = req.body;
-    console.log(">>>>>>>>>>>>>", nftId, amount);
     try {
       const nft = await NFTs.findOne({
         where: { id: nftId },
@@ -483,7 +470,6 @@ export default class ContractController {
 
   static async newBidPlaced(req, res) {
     const { orderData, orderId, nftId } = req.body;
-    console.log("HJJJJJJJJJJJ", orderData, orderId, nftId);
     try {
       const order = await Orders.findOne({ where: { id: orderId } });
       order.buyer_address = orderData[8];
