@@ -100,11 +100,11 @@ class User extends Model<User> {
   @Column
   verification_token: string;
 
-  @HasMany(() => Collections)
-  collections: Collections;
+  @HasMany(() => Collections, "user_id")
+  collections: Collections[];
 
-  @HasMany(() => Owners)
-  owned: Owners;
+  @HasMany(() => Owners, "user_id")
+  owned: Owners[];
 
   validPassword(password: string) {
     return bcrypt.compareSync(password, this.password);
@@ -125,6 +125,8 @@ class User extends Model<User> {
       backgroundImageUrl: this.background_image_url,
       followers_num: this.followers_num,
       followings_num: this.followings_num,
+      collections: this.collections,
+      owned: this.owned,
     };
   }
 

@@ -15,7 +15,7 @@ export default class AuthController {
 
     if (user) {
       if (user.verified == 0) {
-        res.json({ result: "not_verified" });
+        return res.json({ result: "not_verified" });
       }
     }
 
@@ -27,7 +27,7 @@ export default class AuthController {
       expiresIn: config.JWT_EXPIRE,
     });
 
-    res.json({ token });
+    return res.json({ token });
   }
 
   static async createUser(req: any, res: any) {

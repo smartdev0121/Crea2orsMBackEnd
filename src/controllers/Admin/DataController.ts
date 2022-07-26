@@ -5,8 +5,27 @@ import HomePage from "src/models/HomePage.model";
 import { WhereOptions } from "sequelize/types";
 import NFTs from "src/models/NFTs.model";
 import Owners from "src/models/Owners.model";
+import Report from "src/models/Report.model";
 
 export default class DataController {
+  static async blockUser(req: any, res: any) {
+    const { id, type } = req.body;
+    try {
+      const blockableUser = await User.findByPk(id);
+      console.log(id, type);
+      if (type == "BLOCK") {
+        blockableUser.verified = -1;
+      } else {
+        blockableUser.verified = 0;
+      }
+
+      await blockableUser.save();
+      const users = await User.findAll({ include: [Collections, Owners] });
+      res.json({ users });
+    } catch (err) {
+      res.status(401).json({ err });
+    }
+  }
   static async fetchUsersData(req: any, res: any) {
     try {
       const users = await User.findAll({ include: [Collections, Owners] });
@@ -16,6 +35,56 @@ export default class DataController {
       res.status(401).json({ result: err });
     }
   }
+
+  static async fetchReports(req: any, res: any) {
+    try {
+      console.log("???");
+      const reports = await Report.findAll({
+        include: [
+          { model: User, as: "user" },
+          { model: User, as: "reportUser" },
+        ],
+      });
+
+      return res.json({ reports });
+    } catch (err) {
+      console.log(err);
+      res.status(401).json({ err });
+      return;
+    }
+  }
+
+  static async markReportRead(req: any, res: any) {
+    try {
+      await Report.update(
+        { status: 1 },
+        { returning: true, where: { status: 0 } }
+      );
+      return res.json({ result: true });
+    } catch (err) {
+      console.log(err);
+      return res.status(401).json({ err });
+    }
+  }
+
+  static async deleteReportMsg(req: any, res: any) {
+    const { id } = req.body;
+    try {
+      await Report.destroy({ where: { id: id } });
+      const reports = await Report.findAll({
+        include: [
+          { model: User, as: "user" },
+          { model: User, as: "reportUser" },
+        ],
+      });
+
+      return res.json({ reports });
+    } catch (err) {
+      console.log(err);
+      return res.status(401).json({ err });
+    }
+  }
+
   static async fetchCollectionData(req: any, res: any) {
     const keyword = req.body.keyword;
     try {
