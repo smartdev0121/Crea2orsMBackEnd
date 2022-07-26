@@ -7,6 +7,7 @@ export const authenticate =
   (req, res, next) => {
     if (!req.user) {
       res.status(401).send("Authorization required");
+      return;
     } else {
       next();
     }

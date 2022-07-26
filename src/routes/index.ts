@@ -128,5 +128,19 @@ router.get(
   "/cr2_apis/admin/delete_category/:id",
   AdminControllers.Data.deleteCategory
 );
+
+router.post("/cr2_apis/admin/block_user", AdminControllers.Data.blockUser);
+
 router.post("/cr2_apis/admin/mode_change", AdminControllers.Data.modeChanged);
+router.post(
+  "/cr2_apis/admin/mark_report_read",
+  AdminControllers.Data.markReportRead
+);
+router.post(
+  "/cr2_apis/admin/delete_report",
+  AdminControllers.Data.deleteReportMsg
+);
+
+router.get("/cr2_apis/admin/fetch_reports", AdminControllers.Data.fetchReports);
+
 export default router;

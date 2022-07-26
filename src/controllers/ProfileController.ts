@@ -84,10 +84,15 @@ export default class ProfileController {
   }
 
   static async reportPage(req: any, res: any) {
-    const { content } = req.body;
+    const { content, customUrl } = req.body;
     try {
-      Report.create({
+      const reportUser = await User.findOne({
+        where: { custom_url: customUrl },
+      });
+      await Report.create({
         user_id: req.user.id,
+        report_user_id: reportUser.id,
+        status: 0,
         content: content,
       });
       res.json({ result: true });

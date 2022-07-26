@@ -47,6 +47,11 @@ export default class UserController {
       });
 
       if (user) {
+        if (user.verified == -1) {
+          res.json({ result: "blocked" });
+          return;
+        }
+
         const token = jwt.sign(user.toJSON(), config.APP_SECRET, {
           expiresIn: config.JWT_EXPIRE,
         });
