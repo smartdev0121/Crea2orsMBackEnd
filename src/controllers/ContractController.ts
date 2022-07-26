@@ -39,7 +39,7 @@ export default class ContractController {
         category: metaData.category,
         subCategory: subCategory.id,
         token_limit: metaData.tokenLimit,
-        image_url: imageUri,
+        image_url: imageUri || "",
       });
 
       const user = await User.findOne({
