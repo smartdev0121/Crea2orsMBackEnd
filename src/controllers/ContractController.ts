@@ -123,7 +123,7 @@ export default class ContractController {
         batch_size: metaData.batchSize,
         alter_text: metaData.alterText,
         royalty_fee: metaData.royaltyFee,
-        nft_id: nftId,
+        nft_id: -1,
         minted_count: 0,
         signature: signature,
         file_url: fileUri,
@@ -322,7 +322,7 @@ export default class ContractController {
   }
 
   static async nftMinted(req: any, res: any) {
-    const { nftId, amount } = req.body;
+    const { nftId, contractNftId, amount } = req.body;
     try {
       const nft = await NFTs.findOne({
         where: { id: nftId },
@@ -330,6 +330,7 @@ export default class ContractController {
       });
 
       nft.minted_count += amount;
+      nft.nft_id = contractNftId || 0;
       await nft.save();
 
       const ownerExist = await Owners.findOne({
@@ -369,7 +370,7 @@ export default class ContractController {
         include: [User, NFTs],
       });
 
-      res.json({ nftInfo: { ...nft.toJSON(), owners, creator } });
+      res.json({ result: true });
     } catch (err) {
       console.log(err);
       res.status(401).json({ error: err });
