@@ -35,10 +35,10 @@ export default class ProfileController {
   }
 
   static async fetchHomepageContent(req: any, res: any) {
-    const { keyword } = req.params;
+    // const { keyword } = req.params;
     try {
       const contents = await HomePage.findAll({
-        where: { category: keyword },
+        // where: { category: keyword },
         include: [Collections],
       });
 

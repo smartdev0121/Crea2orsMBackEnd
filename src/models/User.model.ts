@@ -69,6 +69,21 @@ class User extends Model<User> {
   })
   nick_name: string;
 
+  @Column({
+    allowNull: true,
+  })
+  twitter_username: string;
+
+  @Column({
+    allowNull: true,
+  })
+  facebook_username: string;
+
+  @Column({
+    allowNull: true,
+  })
+  instagram_username: string;
+
   get fullName() {
     return `${this.nick_name}`;
   }
@@ -126,6 +141,9 @@ class User extends Model<User> {
       followers_num: this.followers_num,
       followings_num: this.followings_num,
       collections: this.collections,
+      twitter_username: this.twitter_username,
+      facebook_username: this.facebook_username,
+      instagram_username: this.instagram_username,
       owned: this.owned,
     };
   }

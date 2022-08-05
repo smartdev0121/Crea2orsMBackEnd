@@ -179,6 +179,7 @@ export default class UserController {
   // @validator([bodyCheck("email").exists().isEmail()])
   static async setUserInfo(req: any, res: any) {
     const { body, file } = req;
+    console.log(body.facebook_username, typeof body.facebook_username);
     try {
       const exist = await User.findByEmail(body.email);
       const user = await User.findByPk(req.user.id);
@@ -187,6 +188,9 @@ export default class UserController {
       user.bio = body.bio;
       user.personal_site = body.personalSite;
       user.email = body.email;
+      user.facebook_username = body.facebook_username || "";
+      user.twitter_username = body.twitter_username || "";
+      user.instagram_username = body.facebook_username || "";
 
       if (JSON.parse(body.handled)) user.avatar_url = file.filename;
       await user.save();

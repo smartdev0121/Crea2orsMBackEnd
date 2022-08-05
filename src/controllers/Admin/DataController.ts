@@ -158,10 +158,11 @@ export default class DataController {
 
   static async modeChanged(req: any, res: any) {
     const { option, type, collectionId } = req.body;
+    console.log(type);
     try {
       if (option == "None") {
         await HomePage.destroy({
-          where: { collection_id: collectionId },
+          where: { collection_id: collectionId, category: type },
         });
       } else {
         const item = await HomePage.findOne({
@@ -169,7 +170,7 @@ export default class DataController {
         });
         if (item) {
           await HomePage.destroy({
-            where: { collection_id: collectionId },
+            where: { collection_id: collectionId, category: type },
           });
         }
         await HomePage.create({
@@ -178,7 +179,9 @@ export default class DataController {
           mode: option,
         });
       }
-      res.json({ result: true });
+
+      const homepageDatas = await HomePage.findAll();
+      res.json({ homepageDatas });
     } catch (err) {
       console.log(err);
       res.status(401).json({});
