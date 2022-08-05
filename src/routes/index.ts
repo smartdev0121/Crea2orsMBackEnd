@@ -43,7 +43,7 @@ router.post("/cr2_apis/admin/users", AdminControllers.User.createUser);
 router.post("/cr2_apis/admin/auth/login", AdminControllers.User.login);
 
 router.get(
-  "/cr2_apis/fetch_homepage/:keyword",
+  "/cr2_apis/fetch_homepage",
   Controllers.Profile.fetchHomepageContent
 );
 
