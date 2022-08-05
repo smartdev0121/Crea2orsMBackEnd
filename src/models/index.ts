@@ -12,7 +12,7 @@ const sequelize = new Sequelize({
 });
 try {
   sequelize
-    .sync({ force: true })
+    .sync({ force: false })
     .then((res) => {})
     .catch((err) => console.log("==========", err));
 } catch (err) {
