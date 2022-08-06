@@ -93,7 +93,6 @@ router.post("/cr2_apis/nft-minted", Controllers.Contract.nftMinted);
 router.use("/pusher/auth", Controllers.Pusher.auth);
 
 router.post("/cr2_apis/auth/reset_password", Controllers.Auth.resetPassword);
-router.post("/cr2_apis/email-verified", Controllers.User.emailVerified);
 router.get("/cr2_apis/get-user-info", Controllers.User.getUserInfo);
 router.post("/cr2_apis/reportpage", Controllers.Profile.reportPage);
 router.post(
