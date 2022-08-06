@@ -3,7 +3,7 @@ import config from "../config";
 
 const sequelize = new Sequelize({
   username: config.DB_USERNAME,
-  password: config.DB_PASSWORD,
+  password: config.DB_PASSWORD || "",
   database: config.DB_DATABASE,
   host: config.DB_HOST,
   dialect: config.DB_CONNECTION,
