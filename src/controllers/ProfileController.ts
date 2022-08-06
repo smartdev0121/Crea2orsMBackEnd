@@ -16,6 +16,7 @@ export default class ProfileController {
   static async info(req: any, res: any) {
     let user = null;
     const walletAddress = req.params.walletAddress;
+    console.log(walletAddress);
     try {
       user = await User.findOne({
         where: { wallet_address: walletAddress },
