@@ -24,10 +24,10 @@ export default class UserController {
     res.json(users);
   }
 
-  @validator([
-    bodyCheck("email").exists().isEmail(),
-    bodyCheck("id").optional().isInt(),
-  ])
+  // @validator([
+  //   bodyCheck("email").exists().isEmail(),
+  //   bodyCheck("id").optional().isInt(),
+  // ])
   // static async emailExists(req: any, res: any) {
   //   const { body } = req;
   //   const id = body.id || req.user.id;
@@ -88,10 +88,10 @@ export default class UserController {
     }
   }
 
-  @validator([
-    bodyCheck("email").exists().isEmail(),
-    bodyCheck("nick_name").exists(),
-  ])
+  // @validator([
+  //   bodyCheck("email").exists().isEmail(),
+  //   bodyCheck("nick_name").exists(),
+  // ])
   static async create(req: any, res: any) {
     const { body } = req;
 
