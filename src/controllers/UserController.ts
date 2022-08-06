@@ -28,17 +28,16 @@ export default class UserController {
     bodyCheck("email").exists().isEmail(),
     bodyCheck("id").optional().isInt(),
   ])
-  static async emailExists(req: any, res: any) {
-    const { body } = req;
-    const id = body.id || req.user.id;
-    const user = await User.findByEmail(body.email);
-    if (!user || user.id == id) {
-      res.json({ exists: false });
-    } else {
-      res.json({ exists: true });
-    }
-  }
-
+  // static async emailExists(req: any, res: any) {
+  //   const { body } = req;
+  //   const id = body.id || req.user.id;
+  //   // const user = await User.findByEmail(body.email);
+  //   if (!user || user.id == id) {
+  //     res.json({ exists: false });
+  //   } else {
+  //     res.json({ exists: true });
+  //   }
+  // }
   static async setWalletAddress(req, res) {
     const { walletAddress } = req.body;
     try {
@@ -95,23 +94,18 @@ export default class UserController {
   ])
   static async create(req: any, res: any) {
     const { body } = req;
-    const email = body.email;
-    const duplicates = await User.findByEmail(email);
-    if (duplicates) {
-      res.status(422).json({ email: "dupllicates" });
-      return;
-    }
 
     const user = await User.create({
       ...body,
     });
-    const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
-    const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
 
-    sendMailGun(email, "Confirm Email", "emailConfirm", {
-      name: body.nickName,
-      url: confirmUrl,
-    });
+    // const token = jwt.sign({ email }, config.APP_SECRET, { expiresIn: 3600 });
+    // const confirmUrl = `${config.FRONT_URL}/email-confirm/${token}/${email}`;
+
+    // sendMailGun(email, "Confirm Email", "emailConfirm", {
+    //   name: body.nickName,
+    //   url: confirmUrl,
+    // });
 
     res.json(user);
   }
@@ -127,15 +121,6 @@ export default class UserController {
     });
 
     res.json({});
-  }
-
-  static async emailVerified(req: any, res: any) {
-    const { body } = req;
-    const email = body.email;
-    const user = await User.findByEmail(email);
-    user.verified = 1;
-    await user.save();
-    res.json({ result: true });
   }
 
   static async getUserInfo(req: any, res: any) {
@@ -166,7 +151,7 @@ export default class UserController {
   };
 
   static addFollow = async (req: any, res: any) => {
-    const otherUser = await User.findByEmail(req.body.email);
+    const otherUser = await User.findByPk(req.body.other_id);
     const curUser = await User.findByPk(req.user.id);
     otherUser.followers_num = otherUser.followers_num + 1;
     curUser.followings_num = curUser.followings_num + 1;
@@ -181,13 +166,11 @@ export default class UserController {
     const { body, file } = req;
     console.log(body.facebook_username, typeof body.facebook_username);
     try {
-      const exist = await User.findByEmail(body.email);
       const user = await User.findByPk(req.user.id);
       user.nick_name = body.nick_name;
       user.custom_url = body.customUrl;
       user.bio = body.bio;
       user.personal_site = body.personalSite;
-      user.email = body.email;
       user.facebook_username = body.facebook_username || "";
       user.twitter_username = body.twitter_username || "";
       user.instagram_username = body.facebook_username || "";

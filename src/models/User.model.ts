@@ -28,12 +28,6 @@ class User extends Model<User> {
 
   @Column({
     allowNull: true,
-    unique: true,
-  })
-  email: string;
-
-  @Column({
-    allowNull: true,
     type: DataType.TEXT,
   })
   bio: string;
@@ -128,7 +122,6 @@ class User extends Model<User> {
   toJSON() {
     return {
       id: this.id,
-      email: this.email,
       nickName: this.nick_name,
       walletAddress: this.wallet_address,
       role: this.role,
@@ -146,12 +139,6 @@ class User extends Model<User> {
       instagram_username: this.instagram_username,
       owned: this.owned,
     };
-  }
-
-  static findByEmail(email) {
-    return User.findOne({
-      where: { email },
-    });
   }
 
   static findByCustomUrl(url) {
